@@ -302,13 +302,13 @@ if (isset($_GET['id'])) {
                                 <label for="nom" class="form-label">Nom</label>
                                 <input type="text" id="nom" name="nom" class="form-control" 
                                 value="<?= isset($tacheData['nom']) ? htmlspecialchars($tacheData['nom']) : '' ?>" 
-                                placeholder="Nom de la tâche..." required>
+                                placeholder="Nom de la tâche..." >
                             </div>
 
                             <!-- Champ Status -->
                             <div class="col-md-6">
                                 <label for="status" class="form-label">Status</label>
-                                <select id="status" name="status" class="form-control" required>
+                                <select id="status" name="status" class="form-control" >
                                     <option value="">Sélectionner un type</option>
                                     <option value="en cour" <?= isset($tacheData['status']) && $tacheData['status'] == 'en cour' ? 'selected' : '' ?>>En cours</option>
                                     <option value="atteinte" <?= isset($tacheData['status']) && $tacheData['status'] == 'atteinte' ? 'selected' : '' ?>>Atteinte</option>
@@ -320,13 +320,13 @@ if (isset($_GET['id'])) {
                             <div class="col-md-6">
                                 <label for="date_limite" class="form-label">Date Limite</label>
                                 <input type="date" id="date_limite" name="date_limite" class="form-control" 
-                                value="<?= isset($tacheData['date_echeance']) ? htmlspecialchars($tacheData['date_echeance']) : '' ?>" required>
+                                value="<?= isset($tacheData['date_echeance']) ? htmlspecialchars($tacheData['date_echeance']) : '' ?>" >
                             </div>
 
                             <!-- Champ Description -->
                             <div class="col-12">
                                 <label for="description" class="form-label">Description</label>
-                                <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez la tâche en détail..." required><?= isset($tacheData['description']) ? htmlspecialchars($tacheData['description']) : '' ?></textarea>
+                                <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez la tâche en détail..." ><?= isset($tacheData['description']) ? htmlspecialchars($tacheData['description']) : '' ?></textarea>
                             </div>
                         </div>
 
@@ -413,6 +413,14 @@ document.querySelector("form").addEventListener("submit", function(e) {
         e.preventDefault(); // bloque l'envoi du formulaire
         return;
     }
+    // Vérification que le champ Nom contient uniquement des lettres alphabétiques
+    if (!/^[a-zA-Z]+$/.test(nom)) {
+        alert("Le champ Nom doit contenir uniquement des lettres (sans espaces ni caractères spéciaux).");
+        e.preventDefault(); // bloque l'envoi du formulaire
+        return;
+    }
+
+   
 
     // Optionnel : on vérifie que la date limite n’est pas dans le passé
     const today = new Date().toISOString().split('T')[0];

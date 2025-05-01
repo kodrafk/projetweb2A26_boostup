@@ -1,27 +1,21 @@
-<?php
-require_once __DIR__ . '/../../../config.php';
-
-try {
-    $pdo = config::getConnexion();
-    $stmt = $pdo->query("SELECT * FROM objectif");
-    $objectifs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    die('Erreur : ' . $e->getMessage());
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Objectifs - BoostUp</title>
-  <meta name="description" content="Liste des objectifs">
-  <meta name="keywords" content="objectifs, gestion, BoostUp">
+  <title>Index - BoostUp</title>
+  <meta name="description" content="My great site">
+  <meta name="keywords" content="">
 
   <!-- Favicons -->
   <link href="assets/img/bot.jpg" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -75,26 +69,60 @@ try {
     .btn-danger, .btn-warning {
       margin-right: 10px;
     }
+  </style>
 
+  <!-- Style personnalisé -->
+<style>
+    /* Style pour les cartes */
     .custom-card {
       border-radius: 15px;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
+  
     .custom-card:hover {
       transform: translateY(-5px);
       box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
     }
-
+  
+    /* Animation au clic sur la carte */
+    .custom-card:active {
+      transform: translateY(3px);
+    }
+  
+    /* Amélioration de la couleur du bouton */
     .btn-primary {
       background-color: #007bff;
       border-color: #007bff;
       transition: background-color 0.3s;
     }
-
+  
     .btn-primary:hover {
       background-color: #0056b3;
       border-color: #004085;
+    }
+  
+    /* Effet d'ombre et de zoom pour l'animation */
+    .custom-card-body {
+      padding: 20px;
+      transition: transform 0.3s ease;
+    }
+  
+    .custom-card-body:hover {
+      transform: scale(1.05);
+    }
+  
+    /* Design du bouton 'Afficher plus' */
+    .btn-outline-primary {
+      border-radius: 25px;
+      padding: 12px 30px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+  
+    .btn-outline-primary:hover {
+      background-color: #007bff;
+      color: white;
+      border-color: #007bff;
     }
   </style>
 </head>
@@ -115,15 +143,12 @@ try {
       <!-- Centered navigation -->
       <nav id="navmenu" class="navmenu mx-auto">
         <ul class="d-flex align-items-center justify-content-center mb-0" style="font-size: 14px; gap: 20px;">
-            <li class="dropdown"><a href="#"><span>Projets</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <!-- Lien vers la page Projet -->
-                  <li><a href="projet.html">Projet</a></li>
-                  <!-- Lien vers la page Catégorie Projet -->
-                  <li><a href="categorie.html">Catégorie Projet</a></li>
-                </ul>
-              </li>
-
+          <li class="dropdown"><a href="#"><span>Projets</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="projet.html">Projet</a></li>
+              <li><a href="categorie.html">Catégorie Projet</a></li>
+            </ul>
+          </li>
 
           <li class="dropdown"><a href="#"><span>Taches</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
@@ -222,201 +247,133 @@ try {
 
     
     <!-- Features Cards Section -->
-    <section id="features-cards" class="features-cards section">
+<section id="features-cards" class="features-cards section">
     <div class="container">
       <div class="row gy-4">
   
+        <!-- Cours Card -->
         <div class="col-xl-3 col-md-6">
           <div class="feature-box orange hover-zoom">
-            <i class="bi bi-code-slash"></i>
-            <h4>20 Projets Web</h4>
-            <p>Des plateformes dynamiques conçues pour les besoins des startups modernes.</p>
+            <i class="bi bi-book"></i>
+            <h4>Cours</h4>
+            <p>Apprenez les compétences essentielles avec nos cours spécialisés.</p>
+            <a href="#cours" class="btn btn-primary">View Playlist</a>
           </div>
         </div>
   
+        <!-- Vidéos Card -->
         <div class="col-xl-3 col-md-6">
           <div class="feature-box blue hover-zoom">
-            <i class="bi bi-phone"></i>
-            <h4>15 Projets Mobile</h4>
-            <p>Applications innovantes pour Android et iOS adaptées aux jeunes entreprises.</p>
+            <i class="bi bi-play-circle"></i>
+            <h4>Vidéos</h4>
+            <p>Accédez à des vidéos pédagogiques pour améliorer vos compétences.</p>
+            <a href="#videos
+            " class="btn btn-primary">View Playlist</a>
           </div>
         </div>
   
+        <!-- Articles Card -->
         <div class="col-xl-3 col-md-6">
           <div class="feature-box green hover-zoom">
-            <i class="bi bi-bar-chart"></i>
-            <h4>10 Projets Data</h4>
-            <p>Solutions d'analyse de données pour aider à la prise de décision stratégique.</p>
+            <i class="bi bi-newspaper"></i>
+            <h4>Articles</h4>
+            <p>Lisez des articles inspirants pour vous aider dans votre parcours entrepreneurial.</p>
+            <a href="#articles" class="btn btn-primary">View Playlist</a>
           </div>
         </div>
   
+        <!-- Événements Card -->
         <div class="col-xl-3 col-md-6">
           <div class="feature-box red hover-zoom">
-            <i class="bi bi-people"></i>
-            <h4>8 Ressources Partagées</h4>
-            <p>Mentors, investisseurs et collaborateurs disponibles pour chaque projet.</p>
+            <i class="bi bi-calendar-event"></i>
+            <h4>Événements</h4>
+            <p>Participez à des événements en ligne et en personne pour élargir votre réseau.</p>
+            <a href="#events" class="btn btn-primary">View Playlist</a>
           </div>
         </div>
   
       </div>
     </div>
-    </section>
-    <!-- /Features Cards Section -->
-
-
-     <!-- Contact Section -->
-     <section id="contact" class="contact section light-background">
-
-    <!-- Section Title -->
-    <div class="container section-title" data-aos="fade-up">
-      <h2>Contact</h2>
-      <p>Besoin d’aide ? N'hésitez pas à nous contacter ou à nous envoyer un message directement via ce formulaire.</p>
-    </div><!-- End Section Title -->
+  </section-->
+  <!-- /Features Cards Section -->
   
-    <div class="container" data-aos="fade-up" data-aos-delay="100">
-      <div class="row g-4 g-lg-5">
-  
-        <!-- Contact Info -->
-        <div class="col-lg-5">
-          <div class="info-box" data-aos="fade-up" data-aos-delay="200">
-            <h3>Informations de Contact</h3>
-            <p>Nous sommes là pour répondre à toutes vos questions.</p>
-  
-            <div class="info-item" data-aos="fade-up" data-aos-delay="300">
-              <div class="icon-box">
-                <i class="bi bi-geo-alt"></i>
-              </div>
-              <div class="content">
-                <h4>Adresse</h4>
-                <p>A108 Freedom Street</p>
-                <p>Seliana, Tunisia</p>
-              </div>
-            </div>
-  
-            <div class="info-item" data-aos="fade-up" data-aos-delay="400">
-              <div class="icon-box">
-                <i class="bi bi-telephone"></i>
-              </div>
-              <div class="content">
-                <h4>Téléphone</h4>
-                <p>+216 77 908 908</p>
-                <p>+216 77 760 760</p>
-              </div>
-            </div>
-  
-            <div class="info-item" data-aos="fade-up" data-aos-delay="500">
-              <div class="icon-box">
-                <i class="bi bi-envelope"></i>
-              </div>
-              <div class="content">
-                <h4>Email</h4>
-                <p>boostup@gmail.com</p>
-              </div>
+   <!-- Contact Section -->
+ <!--section id="contact" class="contact section light-background">
+    <div class="container">
+      <div class="row" id="ressources-container">
+        
+        
+        <div class="col-md-4 mb-4" id="cours">
+          <div class="card shadow-sm custom-card">
+            <div class="card-body">
+              <h5 class="card-title">Introduction au HTML</h5>
+              <p class="card-text">Une vidéo expliquant les bases du HTML pour les débutants.</p>
+              <a href="https://example.com" class="btn btn-primary" target="_blank">Voir la ressource</a>
             </div>
           </div>
         </div>
-  
-        <!-- Contact Form -->
-        <div class="col-lg-7">
-          <div class="contact-form" data-aos="fade-up" data-aos-delay="300">
-            <h3>Ajouter un Categorie</h3>
-            <p>Remplissez les détails de votre projet ici.</p>
-  
-            <form action="forms/Categorie.php" method="post" class="php-email-form">
-              <div class="row gy-4">
-  
-                <div class="col-12">
-                  <input type="text" name="nom_categorie" class="form-control" placeholder="Nom du categorie" required="">
-                </div>
-  
-                <div class="col-12">
-                  <textarea class="form-control" name="description" rows="5" placeholder="Description du categorie" required=""></textarea>
-                </div>
-  
-                <div class="col-12 text-center">
-                  <div class="loading">Chargement...</div>
-                  <div class="error-message"></div>
-                  <div class="sent-message">categorie ajouté avec succès !</div>
-  
-                  <button type="submit" class="btn btn-primary">Enregistrer</button>
-                  <button type="reset" class="btn btn-secondary">Annuler</button>
-                </div>
-  
-              </div>
-            </form>
-  
-          </div>
-        </div><!-- End Form -->
-  
-      </div>
-    </div>
-  
-     </section>
-     <!-- /Contact Section -->
-  
-
-     <!-- Section Affichage des Projets -->
-      <section id="projects" class="section light-background mt-5">
-
-    <div class="container" data-aos="fade-up">
-      <h2 class="text-center mb-4">Liste des Categorie </h2>
-  
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover shadow-sm rounded-3">
-          <thead class="table-light text-center align-middle">
-            <tr>
-              <th>Nom du categorie</th>
-              <th>Description</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody class="text-center align-middle">
-  
-            <!-- Exemple d’une ligne -->
-            <tr>
-              <td>Application Mobile</td>
-              <td>Développement d’une app de gestion des tâches.</td>
-              <td>
-                <button class="btn btn-info btn-sm text-white me-2" style="background-color: #00BFFF; border: none; border-radius: 8px;">
-                  <i class="bi bi-pencil-square"></i> Modifier
-                </button>
-                <button class="btn btn-danger btn-sm" style="background-color: #dc3545; border: none; border-radius: 8px;">
-                  <i class="bi bi-trash3"></i> Supprimer
-                </button>
-              </td>
-            </tr>
-  
-            <!-- Ajoute ici d'autres lignes dynamiquement depuis la base de données ou script -->
-  
-          </tbody>
-        </table>
-      </div>
-    </div>
-  
-      </section>
-     <!-- /fin tableau -->
-
-     <div class="container py-5">
-      <h2 class="text-center mb-4">Liste des Objectifs</h2>
-
-      <?php if (count($objectifs) > 0): ?>
-        <div class="row">
-          <?php foreach ($objectifs as $objectif): ?>
-            <div class="col-md-4 mb-4">
-              <div class="card custom-card">
-                <div class="card-body">
-                  <h5 class="card-title"><?php echo htmlspecialchars($objectif['titre']); ?></h5>
-                  <p class="card-text"><?php echo htmlspecialchars($objectif['description']); ?></p>
-                  <a href="#" class="btn btn-primary">Voir les détails</a>
-                </div>
-              </div>
+    
+        
+        <div class="col-md-4 mb-4" id="cours">
+          <div class="card shadow-sm custom-card">
+            <div class="card-body">
+              <h5 class="card-title">Cours sur le JavaScript</h5>
+              <p class="card-text">Un cours complet pour apprendre le JavaScript depuis zéro.</p>
+              <a href="https://example.com" class="btn btn-primary" target="_blank">Voir la ressource</a>
             </div>
-          <?php endforeach; ?>
+          </div>
         </div>
-      <?php else: ?>
-        <div class="alert alert-warning text-center">Aucun objectif trouvé.</div>
-      <?php endif; ?>
+    
+        
+        <div class="col-md-4 mb-4" id="videos">
+          <div class="card shadow-sm custom-card">
+            <div class="card-body">
+              <h5 class="card-title">Webinaire sur le Marketing</h5>
+              <p class="card-text">Enregistrement d'un webinaire sur les stratégies marketing pour startups.</p>
+              <a href="https://example.com" class="btn btn-primary" target="_blank">Voir le webinaire</a>
+            </div>
+          </div>
+        </div>
+    
+        
+        <div class="col-md-4 mb-4" id="articles">
+          <div class="card shadow-sm custom-card">
+            <div class="card-body">
+              <h5 class="card-title">Comment lancer une startup</h5>
+              <p class="card-text">Des conseils pratiques pour bien démarrer une startup.</p>
+              <a href="https://example.com" class="btn btn-primary" target="_blank">Lire l'article</a>
+            </div>
+          </div>
+        </div>
+    
+        
+        <div class="col-md-4 mb-4" id="articles">
+          <div class="card shadow-sm custom-card">
+            <div class="card-body">
+              <h5 class="card-title">Guide pour lever des fonds</h5>
+              <p class="card-text">Un guide complet pour aider les entrepreneurs à lever des fonds.</p>
+              <a href="https://example.com" class="btn btn-primary" target="_blank">Télécharger le guide</a>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    
+      
+      <div class="text-center mt-3">
+        <button class="btn btn-outline-primary" id="loadMoreBtn">Afficher plus</button>
+      </div>
     </div>
+  </section-->
+
+  <!-- Bouton "Afficher plus" -->
+  <div class="text-center mt-3">
+    <button class="btn btn-outline-primary" id="loadMoreBtn">Afficher plus</button>
+  </div>
+  <!-- /Contact Section -->
+  
+  
+
 
 </main>
 

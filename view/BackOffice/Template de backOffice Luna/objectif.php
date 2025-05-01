@@ -287,13 +287,13 @@ if (isset($_GET['edit'])) {
                                 <!-- Champ Nom -->
                                 <div class="col-md-6">
                                     <label for="nom" class="form-label">Nom</label>
-                                    <input type="text" id="nom" name="nom" class="form-control" value="<?= htmlspecialchars($objectifData['nom']) ?>" placeholder="Nom..." required>
+                                    <input type="text" id="nom" name="nom" class="form-control" value="<?= htmlspecialchars($objectifData['nom']) ?>" placeholder="Nom..." >
                                 </div>
 
                                 <!-- Champ Status -->
                                 <div class="col-md-6">
                                     <label for="status" class="form-label">Status</label>
-                                    <select id="status" name="status" class="form-control" required>
+                                    <select id="status" name="status" class="form-control" >
                                         <option value="">Sélectionner un type</option>
                                         <option value="freelance" <?= $objectifData['status'] == 'freelance' ? 'selected' : '' ?>>freelance</option>
                                         <option value="stage" <?= $objectifData['status'] == 'stage' ? 'selected' : '' ?>>stage</option>
@@ -304,13 +304,13 @@ if (isset($_GET['edit'])) {
                                 <!-- Champ Date Limite -->
                                 <div class="col-md-6">
                                     <label for="date_limite" class="form-label">Date Limite</label>
-                                    <input type="date" id="date_limite" name="date_limite" class="form-control" value="<?= $objectifData['date_limite'] ?>" required>
+                                    <input type="date" id="date_limite" name="date_limite" class="form-control" value="<?= $objectifData['date_limite'] ?>" >
                                 </div>
 
                                 <!-- Champ Description -->
                                 <div class="col-12">
                                     <label for="description" class="form-label">Description</label>
-                                    <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez Objectifs en détail..." required><?= htmlspecialchars($objectifData['description']) ?></textarea>
+                                    <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez Objectifs en détail..." ><?= htmlspecialchars($objectifData['description']) ?></textarea>
                                 </div>
                             </div>
 
