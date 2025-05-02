@@ -9,6 +9,7 @@ error_reporting(E_ALL);
 // Inclure les fichiers nécessaires
 include_once("../config/database.php");
 include_once("../model/projet.php");
+include_once("../model/categorie.php");
 
 // Initialisation des messages
 $errorMessages = [];
@@ -20,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date_debut = $_POST['date_debut'] ?? '';
     $date_fin = $_POST['date_fin'] ?? '';
     $description = $_POST['description'] ?? '';
+    $id_categorie = $_POST['id_categorie'] ?? '';
 
     $errors = [];
 
@@ -28,18 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($date_debut)) $errors[] = "La date de début est obligatoire.";
     if (empty($date_fin)) $errors[] = "La date de fin est obligatoire.";
     if (empty($description)) $errors[] = "La description est obligatoire.";
+    if (empty($id_categorie)) $errors[] = "La catégorie est obligatoire.";
 
    // Si aucune erreur, procéder à l'ajout
    if (empty($errors)) {
         try {
             // Création de l'objet Projet
-            $projet = new Projet($nom_projet, $date_debut, $date_fin, $description);
+            $projet = new Projet($nom_projet, $date_debut, $date_fin, $description, $id_categorie);
 
             //Appel à la méthode pour ajouter le projet
             if ($projet->ajouterProjet()) {
                 // Message de succès
-                //$successMessage = "Projet ajouté avec succès!";
-                header('Location: /BoostUp/view/Backoffice/template/Template_Luna/Projet.php');
+                $successMessage = "Projet ajouté avec succès!";
+                header('Location: /BoostUp/view/Backoffice/template/Template_Luna/Projet.php?success=1');
                 
             } //else {
             //     // Échec

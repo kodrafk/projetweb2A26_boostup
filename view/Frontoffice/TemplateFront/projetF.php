@@ -1,5 +1,14 @@
+<?php
+include_once("../../../config/database.php");
+include_once("../../../model/categorie.php");
+$categories = Categorie::afficherCategories(); // méthode qui récupère toutes les catégories
+?>
+
+
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en">s
 
 <head>
   <meta charset="utf-8">
@@ -468,25 +477,34 @@
               <form action="../../../controller/ajouterProjetFront.php" method="POST" id="projectForm">
                 <div class="row gy-4">
                   <div class="col-12">
-                    <input type="text" name="nom_projet" id="nom_projet" class="form-control" placeholder="Nom du Projet" required>
+                    <input type="text" name="nom_projet" id="nom_projet" class="form-control" placeholder="Nom du Projet">
                     <div id="nom_projet_error" class="validation-message"></div>
                   </div>
     
                   <div class="col-md-6">
-                    <input type="date" class="form-control" name="date_debut" id="date_debut" placeholder="Date de début" required>
+                    <input type="date" class="form-control" name="date_debut" id="date_debut" placeholder="Date de début" >
                     <div id="date_debut_error" class="validation-message"></div>
                   </div>
     
                   <div class="col-md-6">
-                    <input type="date" class="form-control" name="date_fin" id="date_fin" placeholder="Date de fin" required>
+                    <input type="date" class="form-control" name="date_fin" id="date_fin" placeholder="Date de fin" >
                     <div id="date_fin_error" class="validation-message"></div>
                   </div>
     
                   <div class="col-12">
-                    <textarea class="form-control" name="description" id="description" rows="5" placeholder="Description du projet" required></textarea>
+                    <textarea class="form-control" name="description" id="description" rows="5" placeholder="Description du projet" ></textarea>
                     <div id="description_error" class="validation-message"></div>
                   </div>
-    
+                  <div class="col-12">
+  <select name="id_categorie" id="id_categorie" class="form-select">
+    <option value="">-- Sélectionner une catégorie --</option>
+    <?php foreach ($categories as $cat): ?>
+      <option value="<?= $cat['id_categorie'] ?>"><?= htmlspecialchars($cat['nom_categorie']) ?></option>
+    <?php endforeach; ?>
+  </select>
+  <div id="id_categorie_error" class="validation-message"></div>
+</div>
+
                   <div class="col-12 text-center">
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
                     <button type="reset" class="btn btn-secondary">Annuler</button>

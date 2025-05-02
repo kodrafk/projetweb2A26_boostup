@@ -7,8 +7,63 @@ include_once('C:/xampp/htdocs/BoostUp/config/database.php');
 $db = getDB();
 
 try {
-    $sql = "SELECT * FROM Projet";
+    // Récupérer toutes les catégories pour la liste déroulante
+    $sqlCategories = "SELECT * FROM Categorie";
+    $stmtCategories = $db->prepare($sqlCategories);
+    $stmtCategories->execute();
+    $categories = $stmtCategories->fetchAll(PDO::FETCH_ASSOC);
+
+    // Requête SQL de base
+    $sql = "SELECT p.*, c.nom_categorie 
+            FROM Projet p
+            LEFT JOIN Categorie c ON p.id_categorie = c.id_categorie 
+            WHERE 1=1";
+    
+    $params = [];
+    
+    // Filtrage par catégorie si sélectionné
+    if (!empty($_POST['categorie'])) {
+        $sql .= " AND p.id_categorie = :categorie";
+        $params[':categorie'] = $_POST['categorie'];
+    }
+    
+    // Filtrage par date de début si spécifiée
+    if (!empty($_POST['date_debut'])) {
+        $sql .= " AND p.date_debut >= :date_debut";
+        $params[':date_debut'] = $_POST['date_debut'];
+    }
+    
+    // Filtrage par date de fin si spécifiée
+    if (!empty($_POST['date_fin'])) {
+        $sql .= " AND p.date_fin <= :date_fin";
+        $params[':date_fin'] = $_POST['date_fin'];
+    }
+    
+    // Tri des résultats si sélectionné
+    $orderBy = " ORDER BY p.date_debut DESC"; // Par défaut: tri par date récente
+    if (!empty($_POST['tri'])) {
+        switch ($_POST['tri']) {
+            case 'date_ancienne':
+                $orderBy = " ORDER BY p.date_debut ASC";
+                break;
+            case 'date_recente':
+                $orderBy = " ORDER BY p.date_debut DESC";
+                break;
+            case 'fin_ancienne':
+                $orderBy = " ORDER BY p.date_fin ASC";
+                break;
+            case 'fin_recente':
+                $orderBy = " ORDER BY p.date_fin DESC";
+                break;
+        }
+    }
+    
+    $sql .= $orderBy;
+    
     $stmt = $db->prepare($sql);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
     $stmt->execute();
     $projets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -101,6 +156,12 @@ try {
             margin-bottom: 12px;
         }
 
+        .thematique {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
         .actions {
             display: flex;
             justify-content: space-between;
@@ -151,6 +212,57 @@ try {
             color: #28a745;
             font-weight: 500;
         }
+
+        /* Styles pour les filtres */
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .filter-btn {
+            background: #6c63ff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.2s;
+        }
+
+        .filter-btn:hover {
+            background: #5a52d4;
+        }
     </style>
 </head>
 <body>
@@ -164,6 +276,54 @@ try {
         <div class="message">✅ Projet supprimé avec succès !</div>
     <?php endif; ?>
 
+    <!-- Formulaire de filtrage -->
+    <div class="filters">
+        <form method="post">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="categorie">Catégorie</label>
+                    <select id="categorie" name="categorie">
+                        <option value="">Toutes les catégories</option>
+                        <?php foreach ($categories as $categorie): ?>
+                            <option value="<?= $categorie['id_categorie'] ?>" <?= (!empty($_POST['categorie']) && $_POST['categorie'] == $categorie['id_categorie']) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($categorie['nom_categorie']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                
+                <div class="filter-item">
+                    <label for="date_debut">Date de début</label>
+                    <input type="date" id="date_debut" name="date_debut" value="<?= !empty($_POST['date_debut']) ? htmlspecialchars($_POST['date_debut']) : '' ?>">
+                </div>
+                
+                <div class="filter-item">
+                    <label for="date_fin">Date de fin</label>
+                    <input type="date" id="date_fin" name="date_fin" value="<?= !empty($_POST['date_fin']) ? htmlspecialchars($_POST['date_fin']) : '' ?>">
+                </div>
+            </div>
+            
+            <button type="submit" class="filter-btn">
+                <i class="bi bi-search"></i> Rechercher
+            </button>
+        </form>
+    </div>
+
+    <!-- Formulaire de tri -->
+    <div class="filters" style="margin-top: 20px;">
+        <form method="post">
+            <div class="filter-group">
+                <div class="filter-item">
+                    <label for="tri">Trier par</label>
+                    <select id="tri" name="tri" onchange="this.form.submit()">
+                        <option value="date_debut" <?= (!empty($_POST['tri']) && $_POST['tri'] == 'date_debut') ? 'selected' : '' ?>>Date de début </option>
+                        <option value="date_fin" <?= (!empty($_POST['tri']) && $_POST['tri'] == 'date_fin') ? 'selected' : '' ?>>Date de fin </option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <?php if (count($projets) > 0): ?>
         <div class="grid">
             <?php foreach ($projets as $projet): ?>
@@ -172,7 +332,13 @@ try {
                     <div class="date">
                         📅 Du <?= htmlspecialchars($projet['date_debut']) ?> au <?= htmlspecialchars($projet['date_fin']) ?>
                     </div>
-                    <p><?= nl2br(htmlspecialchars($projet['description'])) ?></p>
+                    <div class="thematique">
+                        🎯 Catégorie du projet: <?= !empty($projet['nom_categorie']) ? htmlspecialchars($projet['nom_categorie']) : 'Non spécifiée' ?>
+                    </div>
+                    <div class="description">
+                        <strong>Description du projet :</strong>
+                        <p><?= nl2br(htmlspecialchars($projet['description'])) ?></p>
+                    </div>
                     <div class="actions">
                         <a href="/BoostUp/view/Frontoffice/modifierProjetF.php?id=<?= $projet['id_projet'] ?>" class="btn btn-edit">
                             <i class="bi bi-pencil-square"></i> Modifier
@@ -190,7 +356,6 @@ try {
     <?php endif; ?>
 
     <div style="text-align: center;">
-        <a href="index.php?action=ajouter" class="add-btn"><i class="bi bi-plus-circle"></i> Ajouter un projet</a>
     </div>
 </div>
 

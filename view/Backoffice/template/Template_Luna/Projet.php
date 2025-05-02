@@ -1,8 +1,170 @@
-
+<?php
+include_once("../../../../config/database.php");
+include_once("../../../../model/categorie.php");
+$categories = Categorie::afficherCategories(); // méthode qui récupère toutes les catégories
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<!-- Bootstrap Bundle avec Popper -->
+
+<style>
+        :root {
+            --primary-color: #6c63ff;
+            --secondary-color: #4d44db;
+            --accent-color: #00c896;
+            --light-bg: #f8f9ff;
+            --dark-text: #2a2a72;
+        }
+        
+        .creative-form {
+            background: linear-gradient(135deg, #f8f9ff 0%, #eef2ff 100%);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(108, 99, 255, 0.1);
+            overflow: hidden;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .creative-form:hover {
+            box-shadow: 0 20px 40px rgba(92, 85, 222, 0.15);
+        }
+        
+        .creative-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px 20px 0 0 !important;
+        }
+        
+        .creative-header h6 {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        
+        .creative-body {
+            padding: 2rem;
+            background-color: white;
+        }
+        
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background-color: var(--light-bg);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .section-title {
+            color: var(--dark-text);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e0e0ff;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+            background-color: #fafbff;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(108, 99, 255, 0.25);
+            background-color: white;
+        }
+        
+        .btn-creative {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-creative i {
+            margin-right: 8px;
+        }
+        
+        .btn-primary-creative {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+        
+        .btn-primary-creative:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(108, 99, 255, 0.3);
+        }
+        
+        .btn-secondary-creative {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+        
+        .btn-secondary-creative:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(108, 117, 125, 0.3);
+        }
+        
+        .floating-label {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .floating-label label {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: white;
+            padding: 0 5px;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* Animation */
+        @keyframes floatIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-float {
+            animation: floatIn 0.6s ease-out forwards;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .creative-body {
+                padding: 1.5rem;
+            }
+            
+            .form-section {
+                padding: 1rem;
+            }
+        }
+    </style>
     <meta charset="utf-8">
     <title>Boostup</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -30,8 +192,11 @@
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 </head>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <body>
     <div class="container-fluid position-relative bg-white d-flex p-0">
@@ -44,72 +209,118 @@
         <!-- Spinner End -->
 
 
-        <!-- Sidebar Start -->
-        <div class="sidebar pe-4 pb-3">
-            <nav class="navbar bg-light navbar-light">
-                <a href="index.html" class="navbar-brand mx-4 mb-3">
-                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>DASHMIN</h3>
-                </a>
-                <div class="d-flex align-items-center ms-4 mb-4">
-                    <div class="position-relative">
-                        <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
-                    </div>
-                    <div class="ms-3">
-                        <h6 class="mb-0">Jhon Doe</h6>
-                        <span>Admin</span>
-                    </div>
+<!-- Sidebar Start -->
+<div class="sidebar p-4" style="background-color: #fff; border-right: 1px solid #eee; min-height: 100vh; border-top-right-radius: 20px; border-bottom-right-radius: 20px;">
+    <nav class="navbar navbar-light">
+        <!-- Logo + Nom -->
+        <a href="index.html" class="navbar-brand d-flex align-items-center mb-5">
+            <div class="rounded-circle d-flex justify-content-center align-items-center" style="width: 40px; height: 40px; background-color: #6c63ff;">
+                <i class="fa fa-hashtag text-white"></i>
+            </div>
+            <span class="fs-4 fw-bold ms-3" style="color: #6c63ff;">DASHMIN</span>
+        </a>
+
+        <!-- Profil -->
+       
+
+        <!-- Menu -->
+        <div class="navbar-nav w-100">
+            <a href="index.html" class="nav-item nav-link sidebar-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+
+            <!-- Projets -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle sidebar-link" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Projets</a>
+                <div class="dropdown-menu">
+                    <a href="categorieProjet.html" class="dropdown-item">Categorie Projet</a>
+                    <a href="projet.html" class="dropdown-item">Projet</a>
                 </div>
-                <div class="navbar-nav w-100">
-                    <a href="index.html" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-                    <!-- Gestionne Projets -->
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Projets</a> 
-                        <div class="dropdown-menu bg-transparent border-0">
-                            <a href="categorieProjet.html" class="dropdown-item">Categorie Projet</a> 
-                            <a href="projet.html" class="dropdown-item">Projet</a> 
-                        </div>
-                    </div>
-                
-                    <!-- Gestionne Objectifs -->
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-th me-2"></i>Objectifs</a>
-                        <div class="dropdown-menu bg-transparent border-0">
-                            <a href="tache.html" class="dropdown-item">Tache</a>
-                            <a href="objectif.html" class="dropdown-item">Objectif</a>
-                        </div>
-                    </div>
-                
-                    <!-- Gestionne Ressources -->
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-keyboard me-2"></i>Ressources</a>
-                        <div class="dropdown-menu bg-transparent border-0">
-                            <a href="ressource.html" class="dropdown-item">Ressource</a>
-                            <a href="thematique.html" class="dropdown-item">Thématique</a>
-                        </div>
-                    </div>
-                
-                    <!-- Gestionne Evenements -->
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-table me-2"></i>Evenements</a>
-                        <div class="dropdown-menu bg-transparent border-0">
-                            <a href="evenement.html" class="dropdown-item">Evenement</a>
-                            <a href="opportunite.html" class="dropdown-item">Opportunité</a>
-                        </div>
-                    </div>
-                
-                    <!-- Gestionne Communauté -->
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Communautes</a>
-                        <div class="dropdown-menu bg-transparent border-0">
-                            <a href="questionne.html" class="dropdown-item">Questionne</a>
-                            <a href="reponse.html" class="dropdown-item">Reponse</a>
-                        </div>
-                    </div>
+            </div>
+
+            <!-- Objectifs -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle sidebar-link" data-bs-toggle="dropdown"><i class="fa fa-th me-2"></i>Objectifs</a>
+                <div class="dropdown-menu">
+                    <a href="tache.html" class="dropdown-item">Tâche</a>
+                    <a href="objectif.html" class="dropdown-item">Objectif</a>
                 </div>
-            </nav>
+            </div>
+
+            <!-- Ressources -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle sidebar-link" data-bs-toggle="dropdown"><i class="fa fa-keyboard me-2"></i>Ressources</a>
+                <div class="dropdown-menu">
+                    <a href="ressource.html" class="dropdown-item">Ressource</a>
+                    <a href="thematique.html" class="dropdown-item">Thématique</a>
+                </div>
+            </div>
+
+            <!-- Evenements -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle sidebar-link" data-bs-toggle="dropdown"><i class="fa fa-table me-2"></i>Événements</a>
+                <div class="dropdown-menu">
+                    <a href="evenement.html" class="dropdown-item">Événement</a>
+                    <a href="opportunite.html" class="dropdown-item">Opportunité</a>
+                </div>
+            </div>
+
+            <!-- Communautés -->
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle sidebar-link" data-bs-toggle="dropdown"><i class="fa fa-chart-bar me-2"></i>Communautés</a>
+                <div class="dropdown-menu">
+                    <a href="questionne.html" class="dropdown-item">Questionnaire</a>
+                    <a href="reponse.html" class="dropdown-item">Réponse</a>
+                </div>
+            </div>
         </div>
-        <!-- Sidebar End -->
+    </nav>
+</div>
+<!-- Sidebar End -->
+
+<!-- Custom Style -->
+<style>
+    .sidebar-link {
+        color: #333;
+        padding: 12px 18px;
+        margin-bottom: 10px;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .sidebar-link:hover {
+        background-color: #f0f0ff;
+        color: #6c63ff;
+    }
+
+    .dropdown-menu {
+        border: none;
+        border-radius: 12px;
+        padding: 10px 0;
+        background-color: #fff;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .dropdown-item {
+        padding: 10px 20px;
+        border-radius: 10px;
+        transition: background-color 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+        background-color: #f0f0ff;
+        color: #6c63ff;
+    }
+</style>
+
+<!-- Sidebar End -->
+
+<style>
+    .hover-bg:hover {
+        background-color: #f1f1f1 !important;
+        transition: 0.3s;
+    }
+</style>
+
 
 
         <!-- Content Start -->
@@ -168,7 +379,7 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="fa fa-bell me-lg-2"></i>
-                            <span class="d-none d-lg-inline-flex">Notificatin</span>
+                            <span class="d-none d-lg-inline-flex">Notification</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                             <a href="#" class="dropdown-item">
@@ -203,7 +414,58 @@
                 </div>
             </nav>
             <!-- Navbar End -->
+            <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?> 
+                <!-- Notification Toast Centrée en haut pour ajout -->
+                <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+                    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas fa-check-circle me-2"></i> Catégorie ajoutée avec succès !
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
+                        </div>
+                    </div>
+                </div>
 
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var toast = new bootstrap.Toast(document.getElementById('successToast'));
+                        toast.show();
+                    });
+                </script>
+            <?php endif; ?>
+            <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+    <!-- ✅ Toast de succès centré en haut -->
+    <style>
+        .toast-container {
+            z-index: 1055; /* Assure que la toast est au-dessus des autres éléments */
+        }
+    </style>
+
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i> Projet ajouté avec succès !
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Script d'affichage du toast -->
+    <script>
+        window.addEventListener("DOMContentLoaded", function () {
+            var toastEl = document.getElementById('successToast');
+            if (toastEl) {
+                var toast = new bootstrap.Toast(toastEl, {
+                    delay: 3000 // Durée d'affichage en ms
+                });
+                toast.show();
+            }
+        });
+    </script>
+<?php endif; ?>
 
             <!-- Chart Start -->
             <div class="container-fluid pt-4 px-4">
@@ -211,92 +473,110 @@
                 </div>
             </div>
             <!-- Chart End -->
-         <!-- Formulaire CRUD Projet -->
-<div class="glass-card card mb-4 animate__animated animate__fadeIn">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary text-white">
-        <h6 class="m-0 font-weight-bold"><i class="fas fa-project-diagram me-2"></i> Gestion Projet</h6>
-    </div>
-    <div class="card-body p-4" style="background-color: #F3F6F9;">
-    <form action="../../../../controller/ajouterProjet.php" method="POST">
-    <div class="form-section">
-                <h5 class="section-title"><i class="fas fa-folder-open me-2"></i> Informations du Projet</h5>
-                <div class="row g-3">
-                    
-                    <div class="col-md-6">
-                        <label for="nom_projet" class="form-label">Nom du Projet</label>
-                        <input type="text" id="nom_projet" name="nom_projet" class="form-control" placeholder="Ex: Application Mobile" required>
-                        <div id="nom_projet_error" class="form-text"></div>
-                    </div>
+  <!-- Formulaire CRUD Projet - Version Creative -->
+  <div class="container-fluid pt-4 px-4">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10 col-xl-8">
+                        <div class="creative-form animate__animated animate__fadeInUp">
+                            <div class="creative-header">
+                                <h6 class="m-0"><i class="fas fa-project-diagram me-2"></i> Nouveau Projet</h6>
+                            </div>
+                            <div class="creative-body">
+                                <form action="../../../../controller/ajouterProjet.php" method="POST">
+                                    <div class="form-section animate-float" style="animation-delay: 0.1s;">
+                                        <h5 class="section-title"><i class="fas fa-folder-open me-2"></i> Informations du Projet</h5>
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <div class="floating-label">
+                                                    <label for="nom_projet">Nom du Projet</label>
+                                                    <input type="text" id="nom_projet" name="nom_projet" class="form-control" placeholder="Ex: Application Mobile" required>
+                                                </div>
+                                            </div>
 
-                    <div class="col-md-6">
-                        <label for="date_debut" class="form-label">Date de début</label>
-                        <input type="date" id="date_debut" name="date_debut" class="form-control" required>
-                    </div>
+                                            <div class="col-md-6">
+                                                <div class="floating-label">
+                                                    <label for="id_categorie">Catégorie</label>
+                                                    <select name="id_categorie" id="id_categorie" class="form-select" required>
+                                                        <option value="">-- Sélectionner une catégorie --</option>
+                                                        <?php foreach ($categories as $cat): ?>
+                                                            <option value="<?= $cat['id_categorie'] ?>"><?= htmlspecialchars($cat['nom_categorie']) ?></option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                </div>
+                                            </div>
 
-                    <div class="col-md-6">
-                        <label for="date_fin" class="form-label">Date de fin</label>
-                        <input type="date" id="date_fin" name="date_fin" class="form-control" required>
-                    </div>
+                                            <div class="col-md-6">
+                                                <div class="floating-label">
+                                                    <label for="date_debut">Date de début</label>
+                                                    <input type="date" id="date_debut" name="date_debut" class="form-control" required>
+                                                </div>
+                                            </div>
 
-                    <div class="col-12">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez le projet en détail..." required></textarea>
-                        <div id="description_error" class="form-text"></div>
-                    </div> 
+                                            <div class="col-md-6">
+                                                <div class="floating-label">
+                                                    <label for="date_fin">Date de fin</label>
+                                                    <input type="date" id="date_fin" name="date_fin" class="form-control" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12">
+                                                <div class="floating-label">
+                                                    <label for="description">Description</label>
+                                                    <textarea id="description" name="description" class="form-control" rows="4" placeholder="Décrivez le projet en détail..." required></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="reset" class="btn btn-secondary-creative">
+                                            <i class="fas fa-undo me-1"></i> Réinitialiser
+                                        </button>
+                                        <button type="submit" class="btn btn-primary-creative">
+                                            <i class="fas fa-save me-1"></i> Enregistrer le projet
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <!-- Actions -->
-                <div class="d-flex justify-content-between mt-4">
-                    <div>
-                        <button type="reset" class="btn btn-secondary me-2">
-                            <i class="fas fa-times me-1"></i> Annuler
-                        </button>
-                        <a href="Projet.php">
-                        <button type="submit" class="btn btn-success">
-                            <i class="fas fa-check me-1"></i> Enregistrer
-                        </button></a>
-                    </div>
-                </div>
-                <!-- Action end -->
             </div>
-        </form>
+
+            <!-- Tableau des projets -->
+            <div class="container mt-5">
+                <?php include_once("../../afficherProjets.php") ?>
+            </div>
+        </div>
+        <!-- Content End -->
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
-</div>
-<!-- Form End -->
 
-<!-- Formulaire End -->
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/chart/chart.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/tempusdominus/js/moment.min.js"></script>
+    <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
 
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+    <script src="js/script.js"></script>
 
-<!-- Table pour afficher les projets -->
-<!-- Un exemple de tableau pour afficher les projets (commenté pour le moment) -->
- 
-<div class="container mt-5">
-   <?php 
-   include_once("../../afficherProjets.php")
-   ?>
-</div> 
-
-
-<!-- Back to Top -->
-<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
-
-</div> <!-- Fin de la container -->
-
-<!-- JavaScript Libraries -->
-<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="lib/chart/chart.min.js"></script>
-<script src="lib/easing/easing.min.js"></script>
-<script src="lib/waypoints/waypoints.min.js"></script>
-<script src="lib/owlcarousel/owl.carousel.min.js"></script>
-<script src="lib/tempusdominus/js/moment.min.js"></script>
-<script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
-<script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
-
-<!-- Template Javascript -->
-<script src="js/main.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="js/script.js"></script>
-
+    <script>
+        // Animation au chargement
+        $(document).ready(function() {
+            $('.animate-float').each(function(i) {
+                $(this).css('animation-delay', (i * 0.1) + 's');
+            });
+        });
+    </script>
 </body>
 </html>

@@ -18,6 +18,7 @@ class ProjetController {
             $date_debut = $_POST['date_debut'];
             $date_fin = $_POST['date_fin'];
             $description = $_POST['description'];
+            
             $projet = new Projet($nom, $date_debut, $date_fin, $description);
             $projet->ajouterProjet();
             header("Location: /BoostUp/view/Backoffice/template/Template_Luna/Projet.php"); // redirection après ajout

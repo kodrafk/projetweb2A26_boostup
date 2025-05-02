@@ -8,21 +8,24 @@ class Projet {
     private $date_fin;
     private $description;
     private $pdo;
+    private $id_categorie;
 
     // Constructeur
-    public function __construct($nom_projet, $date_debut, $date_fin, $description) {
+    public function __construct($nom_projet, $date_debut, $date_fin, $description, $id_categorie) {
         $this->nom_projet = $nom_projet;
         $this->date_debut = $date_debut;
         $this->date_fin = $date_fin;
         $this->description = $description;
+        $this->id_categorie = $id_categorie ;
+
         $this->pdo = getDB(); // Connexion à la base de données
     }
 
     // Ajouter un projet
     public function ajouterProjet() {
         //try {
-            $sql = "INSERT INTO Projet (nom_projet, date_debut, date_fin, description) 
-                    VALUES (:nom_projet, :date_debut, :date_fin, :description)";
+            $sql = "INSERT INTO Projet (nom_projet, date_debut, date_fin, description, id_categorie) 
+                    VALUES (:nom_projet, :date_debut, :date_fin, :description, :id_categorie)";
             $stmt = $this->pdo->prepare($sql);
 
             // Lier les paramètres
@@ -30,6 +33,7 @@ class Projet {
             $stmt->bindParam(':date_debut', $this->date_debut);
             $stmt->bindParam(':date_fin', $this->date_fin);
             $stmt->bindParam(':description', $this->description);
+            $stmt->bindParam(':id_categorie', $this->id_categorie);
 
             // Exécuter la requête
             $stmt->execute();
@@ -49,7 +53,9 @@ class Projet {
     public static function afficherProjets() {
         try {
             $db = getDB();
-            $sql = "SELECT * FROM Projet";
+            $sql = "SELECT p.id_projet, p.date_debut, p.date_fin, p.description, c.nom_categorie, AS categorie
+            FROM projet p
+            JOIN categorie c ON p.id_categorie= c.id_categorie";
             $stmt = $db->query($sql);
             
             if ($stmt === false) {
