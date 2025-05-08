@@ -16,6 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $date_debut = $_POST['date_debut'] ?? '';
     $date_fin = $_POST['date_fin'] ?? '';
     $description = $_POST['description'] ?? '';
+    $montant = $_POST['montant'] ?? ''; // Si vous avez un champ montant
+    $montant_paye = $_POST['montant_paye'] ?? 0; // 0 par défaut si vide
+
     $id_categorie = $_POST['id_categorie'] ?? '';
 
     $errors = [];
@@ -24,11 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($date_debut)) $errors[] = "La date de début est obligatoire.";
     if (empty($date_fin)) $errors[] = "La date de fin est obligatoire.";
     if (empty($description)) $errors[] = "La description est obligatoire.";
+    if (empty($montant)) $errors[] = "Le montant est obligatoire."; // Si vous avez un champ montant
     if (empty($id_categorie)) $errors[] = "La catégorie est obligatoire.";
 
     if (empty($errors)) {
         try {
-            $projet = new Projet($nom_projet, $date_debut, $date_fin, $description, $id_categorie);
+            $projet = new Projet($nom_projet, $date_debut, $date_fin, $description, $montant, $montant_paye, $id_categorie);
             if ($projet->ajouterProjet()) {
                 header('Location: /BoostUp/view/Frontoffice/TemplateFront/projetF.php?success=1');
                 exit();

@@ -7,53 +7,56 @@ class Projet {
     private $date_debut;
     private $date_fin;
     private $description;
+    private $montant;
+    private $montant_paye;
     private $pdo;
     private $id_categorie;
-
+    private $likes;
+   private $dislikes;
+  
     // Constructeur
-    public function __construct($nom_projet, $date_debut, $date_fin, $description, $id_categorie) {
+    public function __construct($nom_projet, $date_debut, $date_fin, $description, $montant, $montant_paye,  $id_categorie, $likes = 0, $dislikes = 0) {
         $this->nom_projet = $nom_projet;
         $this->date_debut = $date_debut;
         $this->date_fin = $date_fin;
         $this->description = $description;
-        $this->id_categorie = $id_categorie ;
+        $this->montant = $montant;
+        $this->montant_paye = $montant_paye;
+        $this->id_categorie = $id_categorie;
+        $this->likes = $likes;
+        $this->dislikes = $dislikes;
+       
 
-        $this->pdo = getDB(); // Connexion à la base de données
+        $this->pdo = getDB();
     }
+    
 
     // Ajouter un projet
     public function ajouterProjet() {
-        //try {
-            $sql = "INSERT INTO Projet (nom_projet, date_debut, date_fin, description, id_categorie) 
-                    VALUES (:nom_projet, :date_debut, :date_fin, :description, :id_categorie)";
-            $stmt = $this->pdo->prepare($sql);
+        $sql = "INSERT INTO Projet (nom_projet, date_debut, date_fin, description, montant ,montant_paye, id_categorie, likes, dislikes) 
+                VALUES (:nom_projet, :date_debut, :date_fin, :description,:montant, :montant_paye, :id_categorie, :likes, :dislikes)";
+        $stmt = $this->pdo->prepare($sql);
+    
+        $stmt->bindParam(':nom_projet', $this->nom_projet);
+        $stmt->bindParam(':date_debut', $this->date_debut);
+        $stmt->bindParam(':date_fin', $this->date_fin);
+        $stmt->bindParam(':description', $this->description);
+        $stmt->bindParam(':montant', $this->montant );
+        $stmt->bindParam(':montant_paye', $this->montant_paye );
 
-            // Lier les paramètres
-            $stmt->bindParam(':nom_projet', $this->nom_projet);
-            $stmt->bindParam(':date_debut', $this->date_debut);
-            $stmt->bindParam(':date_fin', $this->date_fin);
-            $stmt->bindParam(':description', $this->description);
-            $stmt->bindParam(':id_categorie', $this->id_categorie);
-
-            // Exécuter la requête
-            $stmt->execute();
-
-            // // Vérification si l'insertion a eu lieu
-            // if ($stmt->rowCount() > 0) {
-            //     echo "Le projet a été ajouté avec succès.";
-            // } else {
-            //     echo "Aucune donnée insérée. Vérifiez les valeurs fournies.";
-            // }
-        // } catch (PDOException $e) {
-        //     echo "Erreur lors de l'ajout du projet : " . $e->getMessage();
-        // }
+        $stmt->bindParam(':id_categorie', $this->id_categorie);
+        $stmt->bindParam(':likes', $this->likes);
+        $stmt->bindParam(':dislikes', $this->dislikes);
+    
+        $stmt->execute();
     }
+    
 
     // Afficher tous les projets
     public static function afficherProjets() {
         try {
             $db = getDB();
-            $sql = "SELECT p.id_projet, p.date_debut, p.date_fin, p.description, c.nom_categorie, AS categorie
+            $sql = "SELECT p.id_projet, p.date_debut, p.date_fin, p.description, p.montant, c.nom_categorie  AS categorie
             FROM projet p
             JOIN categorie c ON p.id_categorie= c.id_categorie";
             $stmt = $db->query($sql);
@@ -77,7 +80,7 @@ class Projet {
     public function modifierProjet($id_projet) {
         $db = getDB();
         $sql = "UPDATE Projet SET nom_projet = :nom_projet, date_debut = :date_debut,
-                date_fin = :date_fin, description = :description
+                date_fin = :date_fin, description = :description, montant = :montant
                 WHERE ID_Projet = :id_projet";
         $stmt = $db->prepare($sql);
         $stmt->execute([
@@ -85,6 +88,7 @@ class Projet {
             ':date_debut' => $this->date_debut,
             ':date_fin' => $this->date_fin,
             ':description' => $this->description,
+            ':montant' => $this->montant,
             ':id_projet' => $id_projet
         ]);
     }
@@ -120,11 +124,11 @@ class Projet {
     }
 
     // Méthode pour mettre à jour un projet
-    public static function updateProjet($id, $nom_projet, $date_debut, $date_fin, $description) {
+    public static function updateProjet($id, $nom_projet, $date_debut, $date_fin, $description,$montant ) {
         $pdo = self::getDB();  // Obtenir la connexion à la base de données
 
         // Préparer la requête de mise à jour
-        $sql = "UPDATE projet SET nom_projet = :nom_projet, date_debut = :date_debut, date_fin = :date_fin, description = :description WHERE ID_Projet = :id";
+        $sql = "UPDATE projet SET nom_projet = :nom_projet, date_debut = :date_debut, date_fin = :date_fin, description = :description, montant = :montant WHERE ID_Projet = :id";
         
         // Exécuter la requête
         $stmt = $pdo->prepare($sql);
@@ -135,7 +139,7 @@ class Projet {
         $stmt->bindParam(':date_debut', $date_debut);
         $stmt->bindParam(':date_fin', $date_fin);
         $stmt->bindParam(':description', $description, PDO::PARAM_STR);
-        
+        $stmt->bindParam(':montant', $montant, PDO::PARAM_STR);
         // Exécuter la requête et retourner le résultat (true si la mise à jour est réussie)
         return $stmt->execute();
     }

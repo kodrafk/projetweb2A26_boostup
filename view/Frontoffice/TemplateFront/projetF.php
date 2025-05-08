@@ -2,7 +2,10 @@
 include_once("../../../config/database.php");
 include_once("../../../model/categorie.php");
 $categories = Categorie::afficherCategories(); // méthode qui récupère toutes les catégories
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 ?>
+
 
 
 
@@ -20,11 +23,14 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
   <!-- Favicons -->
   <link href="assets/img/bot.jpg" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
 
   <!-- Vendor CSS Files -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -57,10 +63,21 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
       z-index: 10;
     }
 
-    .feature-box.orange { background: #ff7f50; }
-    .feature-box.blue { background: #1e90ff; }
-    .feature-box.green { background: #28a745; }
-    .feature-box.red { background: #dc3545; }
+    .feature-box.orange {
+      background: #ff7f50;
+    }
+
+    .feature-box.blue {
+      background: #1e90ff;
+    }
+
+    .feature-box.green {
+      background: #28a745;
+    }
+
+    .feature-box.red {
+      background: #dc3545;
+    }
 
     .hidden-section {
       display: none;
@@ -71,14 +88,17 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     }
 
-    .form-control, .btn {
+    .form-control,
+    .btn {
       border-radius: 8px;
     }
-    .button{
+
+    .button {
       background-color: pink;
     }
 
-    .btn-danger, .btn-warning {
+    .btn-danger,
+    .btn-warning {
       margin-right: 10px;
     }
 
@@ -141,7 +161,7 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
       position: relative;
     }
 
-    .nav-link:hover, 
+    .nav-link:hover,
     .nav-link:focus {
       color: #4a00e0;
       background: rgba(74, 0, 224, 0.05);
@@ -171,6 +191,27 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
       margin-top: 0.5rem;
     }
 
+    #generer_description_btn {
+      background-color: #4a00e0;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 15px;
+    }
+
+    #generer_description_btn:hover {
+      background-color: #8e2de2;
+      transform: translateY(-2px);
+    }
+
+    #generer_description_btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
     .dropdown-item {
       padding: 0.5rem 1.5rem;
       transition: all 0.2s ease;
@@ -181,14 +222,14 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
       color: #4a00e0;
     }
 
-    .notification-icon, 
+    .notification-icon,
     .message-icon {
       color: #666;
       transition: all 0.3s ease;
       font-size: 0.9rem;
     }
 
-    .notification-icon:hover, 
+    .notification-icon:hover,
     .message-icon:hover {
       color: #4a00e0;
       transform: translateY(-2px);
@@ -238,11 +279,12 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
   <header id="header" class="header fixed-top">
     <div class="container-fluid px-4">
       <div class="row align-items-center">
-        
+
         <!-- Logo with animation -->
         <div class="col-md-2">
           <a href="index.html" class="logo d-flex align-items-center">
-            <img src="assets/img/Logo2.png" alt="BoostUp Logo" class="img-fluid logo-img" style="height: 90px; transition: all 0.3s ease;">
+            <img src="assets/img/Logo2.png" alt="BoostUp Logo" class="img-fluid logo-img"
+              style="height: 90px; transition: all 0.3s ease;">
           </a>
         </div>
 
@@ -258,7 +300,8 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="projet.html"><i class="bi bi-kanban me-2"></i>Projet</a></li>
-                  <li><a class="dropdown-item" href="categorie.html"><i class="bi bi-tags me-2"></i>Catégorie Projet</a></li>
+                  <li><a class="dropdown-item" href="categorie.html"><i class="bi bi-tags me-2"></i>Catégorie Projet</a>
+                  </li>
                 </ul>
               </li>
 
@@ -289,7 +332,8 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
                 </a>
                 <ul class="dropdown-menu">
                   <li><a class="dropdown-item" href="#cleaning"><i class="bi bi-calendar3 me-2"></i>Événement</a></li>
-                  <li><a class="dropdown-item" href="#cleaning"><i class="bi bi-lightning-charge me-2"></i>Opportunité</a></li>
+                  <li><a class="dropdown-item" href="#cleaning"><i
+                        class="bi bi-lightning-charge me-2"></i>Opportunité</a></li>
                 </ul>
               </li>
 
@@ -300,8 +344,10 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
                   <i class="bi bi-chevron-down ms-1"></i>
                 </a>
                 <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="#cleaning"><i class="bi bi-question-circle me-2"></i>Question</a></li>
-                  <li><a class="dropdown-item" href="#cleaning"><i class="bi bi-chat-left-text me-2"></i>Réponse</a></li>
+                  <li><a class="dropdown-item" href="#cleaning"><i class="bi bi-question-circle me-2"></i>Question</a>
+                  </li>
+                  <li><a class="dropdown-item" href="#cleaning"><i class="bi bi-chat-left-text me-2"></i>Réponse</a>
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -315,12 +361,12 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
               <i class="bi bi-bell-fill"></i>
               <span class="badge bg-danger rounded-circle position-absolute top-0 start-100 translate-middle">3</span>
             </a>
-            
+
             <a href="#" class="message-icon me-3 position-relative">
               <i class="bi bi-envelope-fill"></i>
               <span class="badge bg-primary rounded-circle position-absolute top-0 start-100 translate-middle">5</span>
             </a>
-            
+
             <div class="dropdown">
               <a href="#" class="user-profile d-flex align-items-center" id="userDropdown" data-bs-toggle="dropdown">
                 <img src="assets/img/avatar-1.webp" alt="User" class="rounded-circle me-2" width="36" height="36">
@@ -329,8 +375,11 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
               <ul class="dropdown-menu dropdown-menu-end">
                 <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Profil</a></li>
                 <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Paramètres</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="index.html#about"><i class="bi bi-box-arrow-right me-2"></i>Déconnexion</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item text-danger" href="index.html#about"><i
+                      class="bi bi-box-arrow-right me-2"></i>Déconnexion</a></li>
               </ul>
             </div>
           </div>
@@ -382,7 +431,9 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
         </div>
       </div>
     </section>
+    <?php
 
+    ?>
     <!-- Features Cards Section -->
     <section id="features-cards" class="features-cards section">
       <div class="container">
@@ -419,14 +470,49 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
       </div>
     </section>
 
+
+
+
+    <script>
+      function parler(texte) {
+        const synthese = window.speechSynthesis;
+        const voix = new SpeechSynthesisUtterance(texte);
+        synthese.speak(voix);
+      }
+    </script>
+    <script>
+      let synthese = window.speechSynthesis;
+      let enTrainDeParler = false;
+      let message = null;
+
+      function parlerInstructions() {
+        if (!enTrainDeParler) {
+          message = new SpeechSynthesisUtterance(
+            "Bienvenue sur notre appplication innovante, l'espace où entrepreneurs et investisseurs se rencontrent pour donner vie à des projets ambitieux. Organisez vos idées, suivez vos objectifs et développez votre réseau professionnel. Commencez dès maintenant en remplissant le formulaire d'ajout de projet, puis explorez et gérez vos projets listés juste en dessous."
+          );
+          message.lang = 'fr-FR';
+          synthese.speak(message);
+          enTrainDeParler = true;
+
+          message.onend = function () {
+            enTrainDeParler = false; // Quand le message finit naturellement
+          };
+        } else {
+          synthese.cancel(); // Arrêter la voix immédiatement
+          enTrainDeParler = false;
+        }
+      }
+    </script>
+
     <!-- Contact Section -->
     <section id="contact" class="contact section light-background">
       <!-- Section Title -->
       <div class="container section-title" data-aos="fade-up">
         <h2>Contact</h2>
-        <p>Besoin d'aide ? N'hésitez pas à nous contacter ou à nous envoyer un message directement via ce formulaire.</p>
+        <p>Besoin d'aide ? N'hésitez pas à nous contacter ou à nous envoyer un message directement via ce formulaire.
+        </p>
       </div>
-    
+
       <div class="container" data-aos="fade-up" data-aos-delay="100">
         <div class="row g-4 g-lg-5">
           <!-- Contact Info -->
@@ -434,7 +520,7 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
             <div class="info-box" data-aos="fade-up" data-aos-delay="200">
               <h3>Informations de Contact</h3>
               <p>Nous sommes là pour répondre à toutes vos questions.</p>
-    
+
               <div class="info-item" data-aos="fade-up" data-aos-delay="300">
                 <div class="icon-box">
                   <i class="bi bi-geo-alt"></i>
@@ -445,7 +531,7 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
                   <p>Seliana, Tunisia</p>
                 </div>
               </div>
-    
+
               <div class="info-item" data-aos="fade-up" data-aos-delay="400">
                 <div class="icon-box">
                   <i class="bi bi-telephone"></i>
@@ -456,7 +542,7 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
                   <p>+216 77 760 760</p>
                 </div>
               </div>
-    
+
               <div class="info-item" data-aos="fade-up" data-aos-delay="500">
                 <div class="icon-box">
                   <i class="bi bi-envelope"></i>
@@ -468,43 +554,70 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
               </div>
             </div>
           </div>
-    
+
           <!-- Contact Form -->
+
           <div class="col-lg-7">
             <div class="contact-form" data-aos="fade-up" data-aos-delay="300">
+
+              <!-- Div pour aligner le bouton à droite -->
+              <div class="d-flex justify-content-end mb-3">
+                <button id="audioButton"
+                  class="btn btn-outline-primary d-flex align-items-center gap-2 shadow-sm rounded-pill px-4 py-2"
+                  onclick="parlerInstructions()">
+                  <i class="bi bi-volume-up-fill"></i>
+                  <span id="audioButtonText">🔊 Écouter</span>
+                </button>
+              </div>
               <h3>Ajouter un Projet</h3>
               <p>Remplissez les détails de votre projet ici.</p>
               <form action="../../../controller/ajouterProjetFront.php" method="POST" id="projectForm">
                 <div class="row gy-4">
                   <div class="col-12">
-                    <input type="text" name="nom_projet" id="nom_projet" class="form-control" placeholder="Nom du Projet">
+                    <input type="text" name="nom_projet" id="nom_projet" class="form-control"
+                      placeholder="Nom du Projet">
                     <div id="nom_projet_error" class="validation-message"></div>
                   </div>
-    
                   <div class="col-md-6">
-                    <input type="date" class="form-control" name="date_debut" id="date_debut" placeholder="Date de début" >
+                    <input type="date" class="form-control" name="date_debut" id="date_debut"
+                      placeholder="Date de début">
                     <div id="date_debut_error" class="validation-message"></div>
                   </div>
-    
                   <div class="col-md-6">
-                    <input type="date" class="form-control" name="date_fin" id="date_fin" placeholder="Date de fin" >
+                    <input type="date" class="form-control" name="date_fin" id="date_fin" placeholder="Date de fin">
                     <div id="date_fin_error" class="validation-message"></div>
                   </div>
-    
+                  <div class="col-12 position-relative">
+          <textarea class="form-control" name="description" id="description" rows="5" placeholder="Description du projet"></textarea>
+          <div id="description_error" class="validation-message"></div>
+          
+          <!-- Bouton à droite dans le champ de texte -->
+          <button type="button" class="btn btn-light btn-sm position-absolute top-50 end-0 translate-middle-y me-3"
+            onclick="parlerDescription()">
+            <i class="bi bi-volume-up-fill"></i>
+          </button>
+        </div>
                   <div class="col-12">
-                    <textarea class="form-control" name="description" id="description" rows="5" placeholder="Description du projet" ></textarea>
-                    <div id="description_error" class="validation-message"></div>
+                  </div>
+
+                  <div class="col-12">
+                    <input type="number" step="0.01" class="form-control" name="montant" id="montant"
+                      placeholder="Montant du projet">
+                    <div id="montant_error" class="validation-message"></div>
                   </div>
                   <div class="col-12">
-  <select name="id_categorie" id="id_categorie" class="form-select">
-    <option value="">-- Sélectionner une catégorie --</option>
-    <?php foreach ($categories as $cat): ?>
-      <option value="<?= $cat['id_categorie'] ?>"><?= htmlspecialchars($cat['nom_categorie']) ?></option>
-    <?php endforeach; ?>
-  </select>
-  <div id="id_categorie_error" class="validation-message"></div>
-</div>
-
+                    <select name="id_categorie" id="id_categorie" class="form-select">
+                      <option value="">-- Sélectionner une catégorie --</option>
+                      <?php foreach ($categories as $cat): ?>
+                        <option value="<?= $cat['id_categorie'] ?>"><?= htmlspecialchars($cat['nom_categorie']) ?>
+                        </option>
+                      <?php endforeach; ?>
+                    </select>
+                    <div id="id_categorie_error" class="validation-message"></div>
+                  </div>
+                  <div class="col-12">
+                    <button type="button" id="generer_description_btn">Générer la description</button>
+                  </div>
                   <div class="col-12 text-center">
                     <button type="submit" class="btn btn-primary">Enregistrer</button>
                     <button type="reset" class="btn btn-secondary">Annuler</button>
@@ -548,7 +661,7 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
             <a href=""><i class="bi bi-linkedin"></i></a>
           </div>
         </div>
-  
+
         <div class="col-lg-2 col-md-3 footer-links">
           <h4>Useful Links</h4>
           <ul>
@@ -559,7 +672,7 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
             <li><a href="#">Privacy policy</a></li>
           </ul>
         </div>
-  
+
         <div class="col-lg-2 col-md-3 footer-links">
           <h4>Our Projets</h4>
           <ul>
@@ -572,18 +685,19 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
         </div>
       </div>
     </div>
-     
+
     <div class="container copyright text-center mt-4">
       <p>© <span>Copyright</span> <strong class="px-1 sitename">BoostUp</strong> <span>All Rights Reserved</span></p>
     </div>
-  
+
     <div class="credits">
       Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
     </div>
   </footer>
-  
+
   <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -599,137 +713,209 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
   <script src="js/script.js"></script>
 
   <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById('projectForm');
-    
-    if (form) {
-      const nomProjet = document.getElementById('nom_projet');
-      const description = document.getElementById('description');
-      const dateDebut = document.getElementById('date_debut');
-      const dateFin = document.getElementById('date_fin');
-      
-      // Fonction pour afficher les messages de validation
-      const showValidationMessage = (element, isValid, message) => {
-        const errorElement = document.getElementById(element.id + '_error');
-        if (errorElement) {
-          errorElement.textContent = message;
-          errorElement.className = 'validation-message ' + (isValid ? 'text-success' : 'text-danger');
-          
-          // Ajout des icônes de validation
-          if (isValid) {
-            element.classList.remove('is-invalid');
-            element.classList.add('is-valid');
-          } else {
-            element.classList.remove('is-valid');
-            element.classList.add('is-invalid');
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById('projectForm');
+
+      if (form) {
+        const nomProjet = document.getElementById('nom_projet');
+        const description = document.getElementById('description');
+        const dateDebut = document.getElementById('date_debut');
+        const dateFin = document.getElementById('date_fin');
+
+        // Fonction pour afficher les messages de validation
+        const showValidationMessage = (element, isValid, message) => {
+          const errorElement = document.getElementById(element.id + '_error');
+          if (errorElement) {
+            errorElement.textContent = message;
+            errorElement.className = 'validation-message ' + (isValid ? 'text-success' : 'text-danger');
+
+            // Ajout des icônes de validation
+            if (isValid) {
+              element.classList.remove('is-invalid');
+              element.classList.add('is-valid');
+            } else {
+              element.classList.remove('is-valid');
+              element.classList.add('is-invalid');
+            }
           }
-        }
-      };
-      
-      // Fonction de validation générique
-      const validateField = (value, rules) => {
-        if (rules.required && value.trim() === '') {
-          return { isValid: false, message: 'Ce champ est obligatoire' };
-        }
-        
-        if (rules.minLength && value.trim().length < rules.minLength) {
-          return { isValid: false, message: `Minimum ${rules.minLength} caractères` };
-        }
-        
-        if (rules.regex && !rules.regex.test(value)) {
-          return { isValid: false, message: rules.customError || 'Format invalide' };
-        }
-        
-        return { isValid: true, message: '✓ Valide' };
-      };
-      
-      // Règles de validation
-      const validationRules = {
-        nom_projet: { required: true, minLength: 3 },
-        description: { required: true, minLength: 10 },
-        date_debut: { required: true },
-        date_fin: { required: true }
-      };
-      
-      // Validation en temps réel
-      nomProjet.addEventListener('input', () => {
-        const result = validateField(nomProjet.value, validationRules.nom_projet);
-        showValidationMessage(nomProjet, result.isValid, result.message);
-      });
-      
-      description.addEventListener('input', () => {
-        const result = validateField(description.value, validationRules.description);
-        showValidationMessage(description, result.isValid, result.message);
-      });
-      
-      // Validation des dates
-      const validateDates = () => {
-        if (dateDebut.value && dateFin.value) {
-          const startDate = new Date(dateDebut.value);
-          const endDate = new Date(dateFin.value);
-          
-          if (startDate > endDate) {
-            showValidationMessage(dateFin, false, 'La date de fin doit être après la date de début');
-            return false;
+        };
+
+        // Fonction de validation générique
+        const validateField = (value, rules) => {
+          if (rules.required && value.trim() === '') {
+            return { isValid: false, message: 'Ce champ est obligatoire' };
+          }
+
+          if (rules.minLength && value.trim().length < rules.minLength) {
+            return { isValid: false, message: `Minimum ${rules.minLength} caractères` };
+          }
+
+          if (rules.regex && !rules.regex.test(value)) {
+            return { isValid: false, message: rules.customError || 'Format invalide' };
+          }
+
+          return { isValid: true, message: '✓ Valide' };
+        };
+
+        // Règles de validation
+        const validationRules = {
+          nom_projet: { required: true, minLength: 3 },
+          description: { required: true, minLength: 10 },
+          date_debut: { required: true },
+          date_fin: { required: true }
+        };
+
+        // Validation en temps réel
+        nomProjet.addEventListener('input', () => {
+          const result = validateField(nomProjet.value, validationRules.nom_projet);
+          showValidationMessage(nomProjet, result.isValid, result.message);
+        });
+
+        description.addEventListener('input', () => {
+          const result = validateField(description.value, validationRules.description);
+          showValidationMessage(description, result.isValid, result.message);
+        });
+
+        // Validation des dates
+        const validateDates = () => {
+          if (dateDebut.value && dateFin.value) {
+            const startDate = new Date(dateDebut.value);
+            const endDate = new Date(dateFin.value);
+
+            if (startDate > endDate) {
+              showValidationMessage(dateFin, false, 'La date de fin doit être après la date de début');
+              return false;
+            } else {
+              showValidationMessage(dateFin, true, '✓ Valide');
+              return true;
+            }
+          }
+          return true;
+        };
+
+        dateDebut.addEventListener('change', () => {
+          if (!dateDebut.value) {
+            showValidationMessage(dateDebut, false, 'Veuillez sélectionner une date');
+          } else {
+            showValidationMessage(dateDebut, true, '✓ Valide');
+            validateDates();
+          }
+        });
+
+        dateFin.addEventListener('change', () => {
+          if (!dateFin.value) {
+            showValidationMessage(dateFin, false, 'Veuillez sélectionner une date');
           } else {
             showValidationMessage(dateFin, true, '✓ Valide');
-            return true;
+            validateDates();
           }
-        }
-        return true;
-      };
-      
-      dateDebut.addEventListener('change', () => {
-        if (!dateDebut.value) {
-          showValidationMessage(dateDebut, false, 'Veuillez sélectionner une date');
-        } else {
-          showValidationMessage(dateDebut, true, '✓ Valide');
-          validateDates();
-        }
-      });
-      
-      dateFin.addEventListener('change', () => {
-        if (!dateFin.value) {
-          showValidationMessage(dateFin, false, 'Veuillez sélectionner une date');
-        } else {
-          showValidationMessage(dateFin, true, '✓ Valide');
-          validateDates();
-        }
-      });
-      
-      // Validation avant soumission
-      form.addEventListener('submit', (e) => {
-        let isValid = true;
-        
-        // Valider chaque champ
-        const nomResult = validateField(nomProjet.value, validationRules.nom_projet);
-        const descResult = validateField(description.value, validationRules.description);
-        const dateStartValid = dateDebut.value !== '';
-        const dateEndValid = dateFin.value !== '';
-        const datesOrderValid = validateDates();
-        
-        // Afficher les erreurs
-        showValidationMessage(nomProjet, nomResult.isValid, nomResult.message);
-        showValidationMessage(description, descResult.isValid, descResult.message);
-        
-        if (!dateStartValid) {
-          showValidationMessage(dateDebut, false, 'Veuillez sélectionner une date');
-        }
-        
-        if (!dateEndValid) {
-          showValidationMessage(dateFin, false, 'Veuillez sélectionner une date');
-        }
-        
-        // Vérifier la validité globale
-        if (!nomResult.isValid || !descResult.isValid || !dateStartValid || !dateEndValid || !datesOrderValid) {
-          e.preventDefault();
-          isValid = false;
-        }
-        
-        return isValid;
-      });
+        });
+
+        // Validation avant soumission
+        form.addEventListener('submit', (e) => {
+          let isValid = true;
+
+          // Valider chaque champ
+          const nomResult = validateField(nomProjet.value, validationRules.nom_projet);
+          const descResult = validateField(description.value, validationRules.description);
+          const dateStartValid = dateDebut.value !== '';
+          const dateEndValid = dateFin.value !== '';
+          const datesOrderValid = validateDates();
+
+          // Afficher les erreurs
+          showValidationMessage(nomProjet, nomResult.isValid, nomResult.message);
+          showValidationMessage(description, descResult.isValid, descResult.message);
+
+          if (!dateStartValid) {
+            showValidationMessage(dateDebut, false, 'Veuillez sélectionner une date');
+          }
+
+          if (!dateEndValid) {
+            showValidationMessage(dateFin, false, 'Veuillez sélectionner une date');
+          }
+
+          // Vérifier la validité globale
+          if (!nomResult.isValid || !descResult.isValid || !dateStartValid || !dateEndValid || !datesOrderValid) {
+            e.preventDefault();
+            isValid = false;
+          }
+
+          return isValid;
+        });
+      }
+    });
+  </script>
+  <!-- jQuery inclus pour faciliter l'usage de AJAX -->
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    function parlerDescription() {
+      const synthese = window.speechSynthesis;
+
+      // Récupérer le texte de la description du projet
+      const descriptionElement = document.getElementById('description');
+      const texteDescription = descriptionElement.value;  // Récupérer la valeur du champ de saisie
+
+      // Si une lecture est déjà en cours, arrêter la lecture
+      if (synthese.speaking) {
+        synthese.cancel();
+        return;
+      }
+
+      // Si le champ est vide, ne pas lire
+      if (texteDescription === '') {
+        alert("La description est vide.");
+        return;
+      }
+
+      // Créer un objet de parole avec le texte
+      const message = new SpeechSynthesisUtterance(texteDescription);
+      message.lang = 'fr-FR';  // Définit la langue française
+      synthese.speak(message);
     }
-  });
+  </script>
+
+  <script>
+    document.getElementById("generer_description_btn").addEventListener("click", function () {
+      const description = document.getElementById("description").value;
+      const button = this;
+
+      if (!description.trim()) {
+        alert("Veuillez entrer une description");
+        return;
+      }
+
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Génération...';
+
+      fetch('/BoostUp/index.php?action=genererDescriptionAjax', {   // <= attention ici, la parenthèse était mal placée !!
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'description=' + encodeURIComponent(description)
+      })
+        .then(response => {
+          if (!response.ok) throw new Error("Erreur HTTP : " + response.status);
+          return response.text();
+        })
+        .then(text => {
+          if (text.startsWith("<!DOCTYPE html>")) {
+            throw new Error("Réponse HTML inattendue");
+          }
+          document.getElementById("description").value = text;
+        })
+        .catch(error => {
+          console.error("Erreur:", error);
+          alert("Erreur lors de la génération");
+        })
+        .finally(() => {
+          button.disabled = false;
+          button.textContent = "Générer la description";
+        });
+    });
   </script>
 </body>
+
 </html>

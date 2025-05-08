@@ -1,67 +1,139 @@
 <?php
-require_once '../model/projet.php';
-require_once '../config/database.php';
+require_once(__DIR__ . '/../model/projet.php');
+require_once(__DIR__ .'/../config/database.php');
+require_once(__DIR__ . '/../vendor/autoload.php'); 
+use GuzzleHttp\Client;
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 class ProjetController {
+    public function ajouter() {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $titre = $_POST['titre'] ?? '';
+            $date_debut = $_POST['date_debut'] ?? '';
+            $date_fin = $_POST['date_fin'] ?? '';
+            $description = $_POST['description'] ?? '';
 
-    //  Afficher tous les projets
-    public function afficher() {
-        $projets = Projet::afficherProjets();
-        require 'View/BackOffice/template/Template_Luna/Projet.php';
+            if (!empty($titre) && !empty($date_debut) && !empty($date_fin) && !empty($description)) {
+                $projet = new Projet(null, $titre, $date_debut, $date_fin, $description);
+                if ($projet->ajouter()) {
+                    header("Location: projet.php?success=1");
+                    exit();
+                } else {
+                    header("Location: projet.php?error=1");
+                    exit();
+                }
+            } else {
+                header("Location: projet.php?error=1");
+                exit();
+            }
+        }
+    }
+
+    public function ajouterF() {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $titre = $_POST['titre'] ?? '';
+            $date_debut = $_POST['date_debut'] ?? '';
+            $date_fin = $_POST['date_fin'] ?? '';
+            $description = $_POST['description'] ?? '';
+
+            if (!empty($titre) && !empty($date_debut) && !empty($date_fin) && !empty($description)) {
+                $projet = new Projet(null, $titre, $date_debut, $date_fin, $description);
+                if ($projet->ajouter()) {
+                    header("Location: projetF.php?success=1");
+                    exit();
+                } else {
+                    header("Location: projetF.php?error=1");
+                    exit();
+                }
+            } else {
+                header("Location: projetF.php?error=1");
+                exit();
+            }
+        }
+    }
+
+    public function modifierProjet() {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $id = $_POST['id_projet'] ?? '';
+            $titre = $_POST['titre'] ?? '';
+            $date_debut = $_POST['date_debut'] ?? '';
+            $date_fin = $_POST['date_fin'] ?? '';
+            $description = $_POST['description'] ?? '';
+
+            if (!empty($id) && !empty($titre) && !empty($date_debut) && !empty($date_fin) && !empty($description)) {
+                $projet = new Projet($id, $titre, $date_debut, $date_fin, $description);
+                if ($projet->modifier()) {
+                    header("Location: projet.php?success=1");
+                    exit();
+                } else {
+                    header("Location: projet.php?error=1");
+                    exit();
+                }
+            } else {
+                header("Location: projet.php?error=1");
+                exit();
+            }
+        }
+    }
+
+    public function genererDescriptionAjax() {
+        header('Content-Type: text/plain');
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+
+    
+        if ($_SERVER["REQUEST_METHOD"] != "POST" || !isset($_POST['description'])) {
+            http_response_code(400);
+            echo "Requête invalide";
+            exit();
+        }
+    
+        $apiKey = 'AIzaSyAe9FSnHXbt8_acjBuFxTB139fL6GKVn5A'; // Remplace par ta vraie clé Gemini
+    
+        $client = new Client();
+        try {
+            $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                [
+                                    'text' => "Améliore cette description projet : " . $_POST['description']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'timeout' => 15
+            ]);
+    
+            $data = json_decode($response->getBody(), true);
+    
+            // Accès au texte généré (attention à bien vérifier le chemin)
+            if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+                echo $data['candidates'][0]['content']['parts'][0]['text'];
+            } else {
+                echo "Erreur : réponse inattendue de l'API Gemini.";
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo "Erreur API : " . $e->getMessage();
+        }
+        exit();
     }
     
 
-    //  Ajouter un projet
-    public function ajouter() {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $nom = $_POST['nom'];
-            $date_debut = $_POST['date_debut'];
-            $date_fin = $_POST['date_fin'];
-            $description = $_POST['description'];
-            
-            $projet = new Projet($nom, $date_debut, $date_fin, $description);
-            $projet->ajouterProjet();
-            header("Location: /BoostUp/view/Backoffice/template/Template_Luna/Projet.php"); // redirection après ajout
-        } else {
-            include 'View/BackOffice/template/Template_Luna/Projet.php'; // le formulaire
-        }
-    }
-
-    //  Ajouter un projetF
-    public function ajouterF() {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $nom = $_POST['nom'];
-            $date_debut = $_POST['date_debut'];
-            $date_fin = $_POST['date_fin'];
-            $description = $_POST['description'];
-            $projet = new Projet($nom, $date_debut, $date_fin, $description);
-            $projet->ajouterProjet();
-            header("Location: /BoostUp/view/Backoffice/TemplateFront/projetF.php"); // redirection après ajout
-        } else {
-            include 'View/Backoffice/TemplateFront/projetF.php'; // le formulaire
-        }
-    }
-
-    // Modifier un projet
-    public function modifierProjet($id, $nom_projet, $date_debut, $date_fin, $description) {
-        $db = getDB();
-        $sql = "UPDATE Projet SET nom_projet = :nom_projet, date_debut = :date_debut, date_fin = :date_fin, description = :description WHERE ID_Projet = :id";
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmt->bindParam(':nom_projet', $nom_projet);
-        $stmt->bindParam(':date_debut', $date_debut);
-        $stmt->bindParam(':date_fin', $date_fin);
-        $stmt->bindParam(':description', $description);
-        $stmt->execute();
-    }
-    //  Supprimer un projet
+ 
+    
     public function supprimer() {
         if (isset($_GET['id'])) {
             Projet::supprimerProjet($_GET['id']);
-            header("Location: index.php?action=afficher");
+            header("Location: projet.php?success=1"); // ou projetF.php selon ta page
+            exit();
         }
     }
-
 }
-
-?>

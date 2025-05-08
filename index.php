@@ -1,27 +1,32 @@
 <?php
-require_once 'Controller/ProjetController.php';
 
-$controller = new ProjetController();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+require_once 'controller/ProjetController.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
-$action = $_GET['action'] ?? 'afficher';
 
-switch ($action) {
-    case 'ajouter':
-        $controller->ajouter();
-        //header('Location: /view/Backoffice/template/Template_Luna/Projet.php ');
-        break;
-    case 'ajouterF':
-        $controller->ajouterF();
-        break;
-    case 'modifier':
-        $controller->modifier();
-        break;
-    case 'supprimer':
-        $controller->supprimer();
-        break;
-    case 'afficher':
-    default:
-        $controller->afficher();
-        break;
+// Route normale des actions
+if (isset($_GET['action'])) {
+    $action = $_GET['action'];
+    $controller = new ProjetController();
+
+    switch ($action) {
+        case 'ajouter':
+            $controller->ajouter();
+            break;
+        case 'ajouterF':
+            $controller->ajouterF();
+            break;
+        case 'modifierProjet':
+            $controller->modifierProjet();
+            break;
+        case 'genererDescriptionAjax':
+            $controller->genererDescriptionAjax();
+            break;
+        default:
+            echo "Action non reconnue.";
+            break;
+    }
 }
 ?>

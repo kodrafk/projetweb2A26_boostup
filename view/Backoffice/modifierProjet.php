@@ -26,9 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date_debut = $_POST['date_debut'];
     $date_fin = $_POST['date_fin'];
     $description = $_POST['description'];
+    $montant = $_POST['montant']; 
 
     // Validation des données
-    if (empty($nom_projet) || empty($date_debut) || empty($date_fin) || empty($description)) {
+    if (empty($nom_projet) || empty($date_debut) || empty($date_fin) || empty($description) || empty($montant)) {
         $errorMessages[] = "Tous les champs sont requis.";
     }
 
@@ -39,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Si pas d'erreurs, mettre à jour le projet
     if (empty($errorMessages)) {
-        $updated = Projet::updateProjet($id, $nom_projet, $date_debut, $date_fin, $description);
+        $updated = Projet::updateProjet($id, $nom_projet, $date_debut, $date_fin, $description, $montant);
         if ($updated) {
             header('Location: /BoostUp/view/Backoffice/template/Template_Luna/Projet.php');
             exit();
@@ -235,7 +236,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="col-md-6 mb-3">
+    <label for="montant" class="form-label">Montant du Projet (€)</label>
+    <input type="number" name="montant" id="montant" class="form-control" value="<?= htmlspecialchars($projet['montant'] ?? ''); ?>" required min="0">
+    <div id="montant_error" class="error-message"></div>
+</div>
                             <div class="d-flex justify-content-between mt-4">
                                 <a href="/BoostUp/view/Backoffice/template/Template_Luna/Projet.php" class="btn btn-outline-secondary">
                                     <i class="fas fa-times me-1"></i> Annuler
@@ -255,126 +260,153 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('projetForm');
-            const inputs = {
-                nom_projet: document.getElementById('nom_projet'),
-                date_debut: document.getElementById('date_debut'),
-                date_fin: document.getElementById('date_fin'),
-                description: document.getElementById('description')
-            };
+       document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const inputs = {
+        nom_projet: document.getElementById('nom_projet'),
+        description: document.getElementById('description'),
+        date_debut: document.getElementById('date_debut'),
+        date_fin: document.getElementById('date_fin'),
+        montant: document.getElementById('montant')
+    };
+
+    // Fonctions de validation
+    function validateNomProjet() {
+        let isValid = true;
+        const nomProjet = inputs.nom_projet.value;
+        const nomError = document.getElementById('nom_projet_error');
+        
+        if (nomProjet === '') {
+            showError(inputs.nom_projet, nomError, 'Le nom du projet est requis');
+            isValid = false;
+        } else if (nomProjet.length < 3) {
+            showError(inputs.nom_projet, nomError, 'Le nom doit contenir au moins 3 caractères');
+            isValid = false;
+        } else {
+            showSuccess(inputs.nom_projet, nomError);
+        }
+        
+        return isValid;
+    }
+
+    function validateDescription() {
+        let isValid = true;
+        const description = inputs.description.value;
+        const descError = document.getElementById('description_error');
+        
+        if (description === '') {
+            showError(inputs.description, descError, 'La description est requise');
+            isValid = false;
+        } else if (description.length < 10) {
+            showError(inputs.description, descError, 'La description doit contenir au moins 10 caractères');
+            isValid = false;
+        } else {
+            showSuccess(inputs.description, descError);
+        }
+        
+        return isValid;
+    }
+
+    function validateDates() {
+        let isValid = true;
+        const dateDebut = inputs.date_debut.value;
+        const dateFin = inputs.date_fin.value;
+        const debutError = document.getElementById('date_debut_error');
+        const finError = document.getElementById('date_fin_error');
+        
+        // Validation date de début
+        if (dateDebut === '') {
+            showError(inputs.date_debut, debutError, 'La date de début est requise');
+            isValid = false;
+        } else {
+            showSuccess(inputs.date_debut, debutError);
+        }
+        
+        // Validation date de fin
+        if (dateFin === '') {
+            showError(inputs.date_fin, finError, 'La date de fin est requise');
+            isValid = false;
+        } else {
+            showSuccess(inputs.date_fin, finError);
+        }
+        
+        // Validation comparaison des dates
+        if (dateDebut && dateFin && dateDebut > dateFin) {
+            showError(inputs.date_debut, debutError, 'La date de début doit être avant la date de fin');
+            showError(inputs.date_fin, finError, 'La date de fin doit être après la date de début');
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+
+    function validateMontant() {
+        let isValid = true;
+        const montant = inputs.montant.value;
+        const montantError = document.getElementById('montant_error');
+        
+        if (montant === '') {
+            showError(inputs.montant, montantError, 'Le montant est requis');
+            isValid = false;
+        } else if (parseFloat(montant) <= 0) {
+            showError(inputs.montant, montantError, 'Le montant doit être supérieur à 0');
+            isValid = false;
+        } else {
+            showSuccess(inputs.montant, montantError);
+        }
+        
+        return isValid;
+    }
+
+    function showError(input, errorElement, message) {
+        errorElement.textContent = message;
+        input.classList.remove('is-valid');
+        input.classList.add('is-invalid');
+    }
+
+    function showSuccess(input, errorElement) {
+        errorElement.textContent = '';
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+    }
+
+    function clearErrors() {
+        for (const key in inputs) {
+            const input = inputs[key];
+            const errorElement = document.getElementById(`${key}_error`);
             
-            // Fonctions de validation
-            function validateNomProjet() {
-                const value = inputs.nom_projet.value.trim();
-                const errorElement = document.getElementById('nom_projet_error');
-                
-                if (value === '') {
-                    showError(inputs.nom_projet, errorElement, 'Le nom du projet est requis');
-                    return false;
-                } else if (value.length < 3) {
-                    showError(inputs.nom_projet, errorElement, 'Le nom doit contenir au moins 3 caractères');
-                    return false;
-                } else {
-                    showSuccess(inputs.nom_projet, errorElement);
-                    return true;
-                }
-            }
-            
-            function validateDescription() {
-                const value = inputs.description.value.trim();
-                const errorElement = document.getElementById('description_error');
-                
-                if (value === '') {
-                    showError(inputs.description, errorElement, 'La description est requise');
-                    return false;
-                } else if (value.length < 10) {
-                    showError(inputs.description, errorElement, 'La description doit contenir au moins 10 caractères');
-                    return false;
-                } else {
-                    showSuccess(inputs.description, errorElement);
-                    return true;
-                }
-            }
-            
-            function validateDates() {
-                let isValid = true;
-                const dateDebut = inputs.date_debut.value;
-                const dateFin = inputs.date_fin.value;
-                const debutError = document.getElementById('date_debut_error');
-                const finError = document.getElementById('date_fin_error');
-                
-                // Validation date de début
-                if (dateDebut === '') {
-                    showError(inputs.date_debut, debutError, 'La date de début est requise');
-                    isValid = false;
-                } else {
-                    showSuccess(inputs.date_debut, debutError);
-                }
-                
-                // Validation date de fin
-                if (dateFin === '') {
-                    showError(inputs.date_fin, finError, 'La date de fin est requise');
-                    isValid = false;
-                } else {
-                    showSuccess(inputs.date_fin, finError);
-                }
-                
-                // Validation comparaison des dates
-                if (dateDebut && dateFin && dateDebut > dateFin) {
-                    showError(inputs.date_debut, debutError, 'La date de début doit être avant la date de fin');
-                    showError(inputs.date_fin, finError, 'La date de fin doit être après la date de début');
-                    isValid = false;
-                }
-                
-                return isValid;
-            }
-            
-            function showError(input, errorElement, message) {
-                errorElement.textContent = message;
-                input.classList.remove('is-valid');
-                input.classList.add('is-invalid');
-            }
-            
-            function showSuccess(input, errorElement) {
+            if (errorElement) {
+                input.classList.remove('is-invalid', 'is-valid');
                 errorElement.textContent = '';
-                input.classList.remove('is-invalid');
-                input.classList.add('is-valid');
             }
-            
-            function clearErrors() {
-                for (const key in inputs) {
-                    const input = inputs[key];
-                    const errorElement = document.getElementById(`${key}_error`);
-                    
-                    input.classList.remove('is-invalid', 'is-valid');
-                    errorElement.textContent = '';
-                }
+        }
+    }
+
+    // Événements de validation en temps réel
+    inputs.nom_projet.addEventListener('input', validateNomProjet);
+    inputs.description.addEventListener('input', validateDescription);
+    inputs.date_debut.addEventListener('change', validateDates);
+    inputs.date_fin.addEventListener('change', validateDates);
+    inputs.montant.addEventListener('input', validateMontant);
+
+    // Validation à la soumission
+    form.addEventListener('submit', function(event) {
+        clearErrors();
+        const isNomValid = validateNomProjet();
+        const isDescValid = validateDescription();
+        const isDatesValid = validateDates();
+        const isMontantValid = validateMontant();
+        
+        if (!isNomValid || !isDescValid || !isDatesValid || !isMontantValid) {
+            event.preventDefault();
+            // Faire défiler jusqu'à la première erreur
+            const firstError = document.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
-            
-            // Événements de validation en temps réel
-            inputs.nom_projet.addEventListener('input', validateNomProjet);
-            inputs.description.addEventListener('input', validateDescription);
-            inputs.date_debut.addEventListener('change', validateDates);
-            inputs.date_fin.addEventListener('change', validateDates);
-            
-            // Validation à la soumission
-            form.addEventListener('submit', function(event) {
-                clearErrors();
-                const isNomValid = validateNomProjet();
-                const isDescValid = validateDescription();
-                const isDatesValid = validateDates();
-                
-                if (!isNomValid || !isDescValid || !isDatesValid) {
-                    event.preventDefault();
-                    // Faire défiler jusqu'à la première erreur
-                    const firstError = document.querySelector('.is-invalid');
-                    if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }
-            });
-        });
+        }
+    });
+});
     </script>
 </body>
 </html>

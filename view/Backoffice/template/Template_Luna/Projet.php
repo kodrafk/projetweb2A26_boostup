@@ -524,6 +524,9 @@ $categories = Categorie::afficherCategories(); // méthode qui récupère toutes
                                                     <label for="description">Description</label>
                                                     <textarea id="description" name="description" class="form-control" rows="4" placeholder="Décrivez le projet en détail..." required></textarea>
                                                 </div>
+                                                <div class="col-12">
+                  <input type="number" step="0.01" class="form-control" name="montant" id="montant" placeholder="Montant du projet">
+
                                             </div>
                                         </div>
                                     </div>
