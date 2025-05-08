@@ -36,6 +36,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'type' => $user->getType()
         ];
 
+        // Récupération de l'IP de l'utilisateur
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $token = '717019b9340c72'; // Remplace par ta clé API IPinfo.io
+
+        // Appel API IPinfo pour obtenir la localisation de l'IP
+        $url = "https://ipinfo.io/{$ip}?token={$token}";
+        $response = file_get_contents($url);
+        $data = json_decode($response, true);
+
+        // Extraction des informations
+        $ville = isset($data['city']) ? $data['city'] : 'Inconnue';
+        $pays = isset($data['country']) ? $data['country'] : 'Inconnu';
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+        // Insertion dans la table connexions
+        $conn = config::getConnexion();
+        $query = "INSERT INTO connexions (user_id, ip, user_agent, ville, pays, is_successful) 
+                  VALUES (:user_id, :ip, :user_agent, :ville, :pays, 1)";
+        $stmt = $conn->prepare($query);
+
+        // Liaison des paramètres
+        $stmt->bindParam(':user_id', $_SESSION['user']['id']);
+        $stmt->bindParam(':ip', $ip);
+        $stmt->bindParam(':user_agent', $user_agent);
+        $stmt->bindParam(':ville', $ville);
+        $stmt->bindParam(':pays', $pays);
+
+        // Exécution de la requête
+        $stmt->execute();
+
         // Redirection selon le type d'utilisateur
         switch ($user->getType()) {
             case 'admin':

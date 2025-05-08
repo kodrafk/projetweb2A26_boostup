@@ -11,6 +11,47 @@ if ($_SESSION['user']['type'] === 'admin') {
     header('Location: Template_de_backOffice_Luna/index.php');
     exit();
 }
+
+/// Traitement de la génération d'avatar si le formulaire est soumis
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['avatarSeed'])) {
+  $userId = $_SESSION['user']['iduser'];
+  $seed = $_POST['avatarSeed'];
+  $style = $_POST['avatarStyle'] ?? 'avataaars';
+  $bgColor = isset($_POST['bgColor']) ? substr($_POST['bgColor'], 1) : '4e73df';
+
+  // Chemin où sauvegarder l'avatar
+  $avatarDir = __DIR__ . '/../../View/BackOffice/afterLogin/avatars/';
+  if (!file_exists($avatarDir)) {
+      if (!mkdir($avatarDir, 0777, true)) {
+          $_SESSION['avatar_error'] = "Impossible de créer le dossier avatars";
+          header('Location: '.$_SERVER['PHP_SELF']);
+          exit();
+      }
+  }
+
+  $avatarFile = $avatarDir . 'avatar_' . $userId . '.svg';
+
+  // URL de l'API DiceBear
+  $apiUrl = "https://api.dicebear.com/6.x/$style/svg?seed=$seed&backgroundColor=$bgColor";
+
+  // Télécharger l'avatar
+  $avatarContent = file_get_contents($apiUrl);
+
+  if ($avatarContent !== false) {
+      // Sauvegarder le fichier
+      file_put_contents($avatarFile, $avatarContent);
+      $_SESSION['avatar_updated'] = true;
+  } else {
+      $_SESSION['avatar_error'] = "Erreur lors de la génération de l'avatar";
+  }
+  
+  // Rediriger pour éviter la soumission multiple du formulaire
+  header('Location: '.$_SERVER['PHP_SELF']);
+  exit();
+}
+// Chemin de l'avatar actuel
+$avatarPath = "../../View/BackOffice/afterLogin/avatars/avatar_" . @$_SESSION['user']['iduser'] . ".svg";
+$defaultSeed = md5($_SESSION['user']['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -100,94 +141,31 @@ if ($_SESSION['user']['type'] === 'admin') {
           </div>
         </div>
 
-        <!-- Affichage statique du profil utilisateur (même style que précédemment) -->
-        <div class="user-profile-static">
-          <div class="content-avatar">
-            <div class="status-user connected"></div> <!-- Ajout de classe "connected" -->
-            <div class="avatar">
-              <svg class="user-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M12,12.5c-3.04,0-5.5,1.73-5.5,3.5s2.46,3.5,5.5,3.5,5.5-1.73,5.5-3.5-2.46-3.5-5.5-3.5Zm0-.5c1.66,0,3-1.34,3-3s-1.34-3-3-3-3,1.34-3,3,1.34,3,3,3Z"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="notice-content">
-            <div class="username-full"><?php echo htmlspecialchars($_SESSION['user']['firstName'] . ' ' . htmlspecialchars($_SESSION['user']['lastName'])); ?></div>
-          </div>
-        </div>
+       
 
-        <style>
-          /* Styles pour maintenir le design existant */
-          .user-profile-static {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-          }
-          
-          .status-user.connected {
-            width: 8px;
-            height: 8px;
-            background: #4CAF50; /* Couleur verte pour "connecté" */
-            border-radius: 50%;
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            border: 2px solid #fff;
-          }
-          
-          .content-avatar {
-            position: relative;
-            width: 32px;
-            height: 32px;
-          }
-          
-          .avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          
-          .user-img {
-            width: 18px;
-            height: 18px;
-            fill: #666;
-          }
-          
-          .username-full {
-            font-weight: 600;
-            font-size: 14px;
-            color: #333;
-          }
-        </style>
-
-        <!-- Ajoutez ce code dans votre section Profile Dropdown -->
-        <label class="popup">
-          <input type="checkbox" />
-          <div tabindex="0" class="burger">
-            <svg viewBox="0 0 24 24" fill="white" height="20" width="20" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2c2.757 0 5 2.243 5 5.001 0 2.756-2.243 5-5 5s-5-2.244-5-5c0-2.758 2.243-5.001 5-5.001zm0-2c-3.866 0-7 3.134-7 7.001 0 3.865 3.134 7 7 7s7-3.135 7-7c0-3.867-3.134-7.001-7-7.001zm6.369 13.353c-.497.498-1.057.931-1.658 1.302 2.872 1.874 4.378 5.083 4.972 7.346h-19.387c.572-2.29 2.058-5.503 4.973-7.358-.603-.374-1.162-.811-1.658-1.312-4.258 3.072-5.611 8.506-5.611 10.669h24c0-2.142-1.44-7.557-5.631-10.647z"></path>
-            </svg>
-          </div>
-          <nav class="popup-window">
-            <legend>Quick Start</legend>
-            <ul>
-              <li>
-                <button onclick="openUserProfileModal()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 4v6.406l-3.753 3.741-6.463-6.462 3.7-3.685h6.516zm2-2h-12.388l1.497 1.5-4.171 4.167 9.291 9.291 4.161-4.193 1.61 1.623v-12.388zm-5 4c.552 0 1 .449 1 1s-.448 1-1 1-1-.449-1-1 .448-1 1-1zm0-1c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2zm6.708.292l-.708.708v3.097l2-2.065-1.292-1.74zm-12.675 9.294l-1.414 1.414h-2.619v2h-2v2h-2v-2.17l5.636-5.626-1.417-1.407-6.219 6.203v5h6v-2h2v-2h2l1.729-1.729-1.696-1.685z"></path>
-                  </svg>
-                  <span>Profil</span>
-                </button>
-              </li>
-              <!-- ... autres éléments du menu ... -->
-            </ul>
-          </nav>
-        </label>
-
+<!-- Burger Menu -->
+<div class="nav-item dropdown">
+    <a href="#" class="nav-link dropdown-toggle" id="userDropdown" onclick="toggleDropdown()">
+        <?php if(file_exists($avatarPath)): ?>
+            <img class="rounded-circle me-lg-2" src="<?= str_replace('../../../', '../../', $avatarPath) ?>?<?= filemtime($avatarPath) ?>" alt="Avatar" style="width: 40px; height: 40px;">
+        <?php else: ?>
+            <img class="rounded-circle me-lg-2" src="https://api.dicebear.com/6.x/avataaars/svg?seed=<?= $defaultSeed ?>" alt="Avatar" style="width: 40px; height: 40px;">
+        <?php endif; ?>
+        <span class="d-none d-lg-inline-flex"><?= htmlspecialchars($_SESSION['user']['firstName'] ?? 'John Doe') ?></span>
+    </a>
+    <div class="dropdown-menu" id="userDropdownMenu">
+        <a href="#" class="dropdown-item" onclick="openAvatarModal()">
+            <i class="fas fa-user-edit me-1"></i> Personnaliser l'avatar
+        </a>
+        <a href="#" class="dropdown-item" onclick="openUserProfileModal()">
+            <i class="fas fa-cog me-1"></i> Paramètres
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="../../../View/FrontOffice/login.php" class="dropdown-item text-danger">
+            <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
+        </a>
+    </div>
+</div>
 <!-- Modal pour les informations utilisateur -->
 <div id="userProfileModal" class="profile-modal">
   <div class="modal-content">
@@ -413,6 +391,323 @@ if ($_SESSION['user']['type'] === 'admin') {
     }
   }
 </script>
+<!-- Modal pour personnaliser l'avatar -->
+<div class="custom-modal" id="avatarModal">
+    <div class="custom-modal-content">
+        <div class="custom-modal-header">
+            <h5 class="custom-modal-title">
+                <i class="fas fa-user-circle me-2"></i>Personnaliser votre avatar
+            </h5>
+            <span class="custom-close" onclick="closeAvatarModal()">&times;</span>
+        </div>
+        <div class="custom-modal-body">
+            <?php if(isset($_SESSION['avatar_updated'])): ?>
+                <div class="custom-alert success">
+                    Avatar mis à jour avec succès!
+                    <span class="alert-close" onclick="this.parentElement.style.display='none'">&times;</span>
+                </div>
+                <?php unset($_SESSION['avatar_updated']); ?>
+            <?php elseif(isset($_SESSION['avatar_error'])): ?>
+                <div class="custom-alert error">
+                    <?= $_SESSION['avatar_error'] ?>
+                    <span class="alert-close" onclick="this.parentElement.style.display='none'">&times;</span>
+                </div>
+                <?php unset($_SESSION['avatar_error']); ?>
+            <?php endif; ?>
+            
+            <div class="avatar-preview-container">
+                <img id="avatarPreview" src="<?= file_exists($avatarPath) ? str_replace('../../../', '../../', $avatarPath).'?'.filemtime($avatarPath) : 'https://api.dicebear.com/6.x/avataaars/svg?seed='.$defaultSeed ?>" 
+                     class="avatar-preview">
+                <button type="button" class="btn-random" onclick="randomizeAvatar()">
+                    <i class="fas fa-random me-1"></i> Aléatoire
+                </button>
+            </div>
+            
+            <form id="avatarForm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+            <input type="hidden" name="userId" value="<?= isset($_SESSION['user']['iduser']) ? htmlspecialchars($_SESSION['user']['iduser']) : '' ?>">
+                <input type="hidden" id="avatarSeed" name="avatarSeed" value="<?= $defaultSeed ?>">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Style</label>
+                        <select class="form-select" id="avatarStyle" name="avatarStyle" onchange="updateAvatarPreview()">
+                            <option value="avataaars">Humain (Avataaars)</option>
+                            <option value="identicon">Géométrique</option>
+                            <option value="bottts">Robot</option>
+                            <option value="micah">Illustration</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Couleur de fond</label>
+                        <input type="color" class="form-color" id="bgColor" 
+                               name="bgColor" value="#4e73df" onchange="updateAvatarPreview()">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeAvatarModal()">
+                        <i class="fas fa-times me-1"></i> Annuler
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save me-1"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Styles pour le dropdown */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+    border-radius: 4px;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #ddd;
+    margin: 4px 0;
+}
+
+/* Styles pour le modal */
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.custom-modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.custom-modal-header {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.custom-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.custom-close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.custom-close:hover {
+    color: black;
+}
+
+.custom-modal-body {
+    padding: 15px 0;
+}
+
+/* Styles supplémentaires */
+.avatar-preview-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.avatar-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+.btn-random {
+    background: none;
+    border: 1px solid #4e73df;
+    color: #4e73df;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-random:hover {
+    background-color: #f8f9fa;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-group {
+    flex: 1;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-select, .form-color {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.custom-alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    position: relative;
+}
+
+.custom-alert.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.custom-alert.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-close {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+</style>
+
+<script>
+// Fonctions pour le dropdown
+function toggleDropdown() {
+    const dropdown = document.getElementById('userDropdownMenu');
+    dropdown.classList.toggle('show');
+}
+
+// Fermer le dropdown si on clique ailleurs
+window.onclick = function(event) {
+    if (!event.target.matches('.nav-link.dropdown-toggle')) {
+        const dropdowns = document.getElementsByClassName('dropdown-menu');
+        for (let i = 0; i < dropdowns.length; i++) {
+            const openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
+
+// Fonctions pour le modal
+function openAvatarModal() {
+    document.getElementById('avatarModal').style.display = 'block';
+    updateAvatarPreview();
+}
+
+function closeAvatarModal() {
+    document.getElementById('avatarModal').style.display = 'none';
+}
+
+// Fonction pour mettre à jour l'aperçu de l'avatar
+function updateAvatarPreview() {
+    const style = document.getElementById('avatarStyle').value;
+    const bgColor = document.getElementById('bgColor').value.substring(1); // Retire le #
+    const seed = Math.random().toString(36).substring(2); // Nouveau seed aléatoire
+    
+    document.getElementById('avatarSeed').value = seed;
+    document.getElementById('avatarPreview').src = 
+        `https://api.dicebear.com/6.x/${style}/svg?seed=${seed}&backgroundColor=${bgColor}`;
+}
+
+// Fonction pour générer un avatar aléatoire
+function randomizeAvatar() {
+    const styles = ['avataaars', 'identicon', 'bottts', 'micah'];
+    document.getElementById('avatarStyle').value = styles[Math.floor(Math.random() * styles.length)];
+    
+    // Générer une couleur aléatoire
+    const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+    document.getElementById('bgColor').value = randomColor;
+    
+    updateAvatarPreview();
+}
+
+// Fermer le modal si on clique en dehors
+window.onclick = function(event) {
+    const modal = document.getElementById('avatarModal');
+    if (event.target === modal) {
+        closeAvatarModal();
+    }
+}
+</script>
+
+
       </div>
     </div>
   </header>

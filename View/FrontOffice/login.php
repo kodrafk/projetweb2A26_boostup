@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -214,6 +215,15 @@ button.ghost {
   margin-top: 5px;
   text-align: left;
 }
+.recaptcha-container {
+  transform: scale(0.90);  /* ajuste la taille : 0.85 = 85% */
+  transform-origin: 0 0;   /* origine en haut à gauche */
+  margin-bottom: 10px;     /* espace en dessous */
+}
+#signUpForm {
+  padding-top: 40px;
+  padding-bottom: 60px;
+}
 
   </style>
 </head>
@@ -227,48 +237,64 @@ button.ghost {
 
   <!-- Container -->
   <div class="container" id="container">
-    <!-- Sign-Up Form -->
-    <div class="form-container sign-up-container">
-      <form id="signUpForm" method="POST" action="ajouter.php">
-        <h1>Create Account</h1>
+   <!-- Sign-Up Form -->
+<div class="form-container sign-up-container">
+  <form id="signUpForm" method="POST" action="ajouter.php">
+  <h1 style="font-size: 24px;">Create Account</h1> 
 
-        <?php if (isset($error)): ?>
-            <div class="error-message"><?php echo $error; ?></div>
-        <?php endif; ?>
+    <?php if (isset($error)): ?>
+        <div class="error-message"><?php echo $error; ?></div>
+    <?php endif; ?>
 
-        <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
-            <div class="success-message">Inscription réussie !</div>
-        <?php endif; ?>
+    <?php if (isset($_GET['success']) && $_GET['success'] == 1): ?>
+        <div class="success-message">Inscription réussie !</div>
+    <?php endif; ?>
 
-        <input type="text" id="firstName" name="firstName" placeholder="First Name"  />
-        <div id="firstNameError" class="error-message"></div>
+    <?php if (isset($_GET['error']) && $_GET['error'] == 'captcha'): ?>
+        <div class="error-message">Veuillez valider le reCAPTCHA.</div>
+    <?php elseif (isset($_GET['error']) && $_GET['error'] == 'captcha_missing'): ?>
+        <div class="error-message">reCAPTCHA non détecté. Veuillez réessayer.</div>
+    <?php endif; ?>
 
-        <input type="text" id="lastName" name="lastName" placeholder="Last Name"  />
-        <div id="lastNameError" class="error-message"></div>
+    <input type="text" id="firstName" name="firstName" placeholder="First Name" />
+    <div id="firstNameError" class="error-message"></div>
 
-        <input type="text" id="phone" name="numtel" placeholder="Phone Number"  />
-        <div id="phoneError" class="error-message"></div>
+    <input type="text" id="lastName" name="lastName" placeholder="Last Name" />
+    <div id="lastNameError" class="error-message"></div>
 
-        <input type="text" id="email" name="email" placeholder="Email"  />
-        <div id="emailError" class="error-message"></div>
+    <input type="text" id="phone" name="numtel" placeholder="Phone Number" />
+    <div id="phoneError" class="error-message"></div>
 
-        <input type="password" id="password" name="password" placeholder="Password" />
-        <div id="passwordError" class="error-message"></div>
+    <input type="text" id="email" name="email" placeholder="Email" />
+    <div id="emailError" class="error-message"></div>
 
-        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password"  />
-        <div id="confirmPasswordError" class="error-message"></div>
+    <input type="password" id="password" name="password" placeholder="Password" />
+    <div id="passwordError" class="error-message"></div>
 
-        <!-- Combo box for selecting role -->
-        <select id="role" name="type"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 10px;">
-          <option value="" disabled selected>Choose Role</option>
-          <option value="admin">👑 Admin</option>
-          <option value="entrepreneur">🚀 Entrepreneur</option>
-          <option value="investor">💼 Investor</option>
-        </select>
+    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" />
+    <div id="confirmPasswordError" class="error-message"></div>
 
-        <button type="submit" name="submit_Add">Sign Up</button>
-      </form>
-    </div>
+    <select id="role" name="type" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; margin-bottom: 10px;">
+      <option value="" disabled selected>Choose Role</option>
+      <option value="admin">👑 Admin</option>
+      <option value="entrepreneur">🚀 Entrepreneur</option>
+      <option value="investor">💼 Investor</option>
+    </select>
+
+    <!-- ✅ reCAPTCHA -->
+    <div class="recaptcha-container">
+  <div class="g-recaptcha" data-sitekey="6Leq1CorAAAAALcUK4taoeTINnY8X47wHjIbfXon"></div>
+</div>
+<div id="recaptchaError" class="error-message"></div>
+
+<button type="submit" name="submit_Add">Sign Up</button>
+
+  </form>
+</div>
+
+<!-- ✅ Script Google -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 
     <!-- Sign-In Form -->
     <div class="form-container sign-in-container">
@@ -279,6 +305,7 @@ button.ghost {
         <?php endif; ?>
         <input type="email" name="email" placeholder="Email" required />
         <input type="password" name="password" placeholder="Password" required />
+        <a href="forgot_password.php">Mot de passe oublié ?</a>
         <button type="submit">Sign In</button>
       </form>
     </div>
