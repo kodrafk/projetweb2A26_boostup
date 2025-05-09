@@ -1,12 +1,138 @@
 <?php
+date_default_timezone_set('Africa/Tunis');
 include '../../../Controller/RessourceC.php';
 require_once(__DIR__ . '/../../../Controller/ThematiqueC.php');
+
+// Historique - début
+$cheminLog = 'C:/xampp/htdocs/Ressources/historique.log'; // Chemin du fichier historique
+
+// Fonction pour lire l'historique depuis le fichier
+function lireHistorique($cheminLog) {
+    if (!file_exists($cheminLog)) return [];
+    $logs = file($cheminLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    return array_reverse($logs); // Afficher les dernières actions en haut
+}
+
+// Fonction pour obtenir le titre de la ressource par ID
+function getTitreRessource($id) {
+    $ressourceC = new RessourceC();
+    $ressource = $ressourceC->getRessourceById($id);
+    return $ressource ? $ressource['titre'] : 'Titre inconnu';
+}
+
+// Fonction pour ajouter une entrée dans l'historique
+/*function ajouterHistorique($cheminLog, $actionDetails) {
+    $currentDateTime = date('Y-m-d H:i:s');
+    $log = "[$currentDateTime] $actionDetails\n";
+    file_put_contents($cheminLog, $log, FILE_APPEND | LOCK_EX);
+}*/
+
+function ajouterHistorique($cheminLog, $actionDetails) {
+    $currentDateTime = date('Y-m-d H:i:s');
+    $log = "[$currentDateTime] $actionDetails\n";
+    file_put_contents($cheminLog, $log, FILE_APPEND | LOCK_EX);
+}
+
+function supprimerHistorique($cheminLog, $ligneASupprimer) {
+    $logs = file($cheminLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $indexDansFichier = count($logs) - 1 - $ligneASupprimer; // Corrige l'index basé sur l'affichage inversé
+
+    if ($indexDansFichier >= 0 && $indexDansFichier < count($logs)) {
+        unset($logs[$indexDansFichier]);
+        $logs = array_values($logs); // Réindexer
+        file_put_contents($cheminLog, implode(PHP_EOL, $logs) . PHP_EOL, LOCK_EX);
+    }
+}
+
+if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    $index = (int) $_GET['delete'];
+    $logsOriginaux = file($cheminLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $ligne = $logsOriginaux[$index] ?? null;
+
+    if ($ligne) {
+        preg_match('/ID: (\d+)/', $ligne, $matches);
+        $ressourceId = $matches[1] ?? null;
+        $titreRessource = $ressourceId ? getTitreRessource($ressourceId) : 'Inconnu';
+        supprimerHistorique($cheminLog, $index);
+    }
+
+    header("Location: ressource.php"); 
+    exit;
+}
+
+
+// Récupérer l'historique et le filtrer
+$historique = lireHistorique($cheminLog);
+$historique = array_filter($historique, 'trim'); // Supprimer les lignes vides
+// Historique - fin
+
+
 $cont = new RessourceC();
 $ressources = $cont->afficherRessource();
 
 // récupérer toutes les thématiques pour la liste déroulante
 $thematiqueC = new ThematiqueC();
 $thematiques = $thematiqueC->afficherThematique();
+
+// Nouveau code pour les statistiques
+$stats = $cont->getStatsByType();
+$labels = [];
+$data = [];
+$colors = ['#6c63ff', '#00d09c', '#ff6384', '#ffcd56'];
+
+foreach ($stats as $index => $item) {
+    $labels[] = $item['type'];
+    $data[] = $item['count'];
+    $bgColors[] = $colors[$index % count($colors)];
+}
+
+// Stats pour le bar chart
+$conn = config::getConnexion();
+$sql = "SELECT t.titre AS thematique, r.type_acces, COUNT(*) AS total 
+        FROM ressources r
+        JOIN thematique t ON r.id_thematique = t.id_thematique
+        GROUP BY t.titre, r.type_acces
+        ORDER BY t.titre";
+
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$results = $stmt->fetchAll();
+
+$thematiquesBar = array_unique(array_column($results, 'thematique'));
+$typesAcces = ['En ligne', 'Live', 'Pdf', 'Video'];
+
+$datasets = [];
+foreach ($typesAcces as $type) {
+    $dataBar = [];
+    foreach ($thematiquesBar as $th) {
+        $count = 0;
+        foreach ($results as $row) {
+            if ($row['thematique'] === $th && $row['type_acces'] === $type) {
+                $count = $row['total'];
+                break;
+            }
+        }
+        $dataBar[] = $count;
+    }
+    
+    $datasets[] = [
+        'label' => $type,
+        'data' => $dataBar,
+        'backgroundColor' => randomColor($type),
+        'borderColor' => 'rgba(255,255,255,0.8)',
+        'borderWidth' => 1
+    ];
+}
+
+function randomColor($type) {
+    switch ($type) {
+        case 'En ligne': return '#6c63ff';
+        case 'Live':     return '#00d09c';
+        case 'Pdf':      return '#ff6384';
+        case 'Video':    return '#ffcd56';
+        default:         return '#cccccc';
+    }
+}
 
 // Vérifier s'il y a un filtre par type
 $typeFiltre = $_GET['type'] ?? '';
@@ -34,6 +160,8 @@ if (isset($_GET['edit_id'])) {
     $ressourceToEdit = $cont->getRessourceById($_GET['edit_id']);
 }
 ?>
+
+
 
 <?php
 // Traitement de la mise à jour
@@ -83,6 +211,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_ressource'])) {
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Dans la section <head> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"-->
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
@@ -225,11 +356,56 @@ body.modal-open {
 }
  
 </style>
+<style>
+    /* Modification du conteneur des graphiques */
+.chart-container {
+    width: 100%;
+    height: 400px;
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
 
+/* Ajustement responsive */
+@media (max-width: 768px) {
+    .chart-container {
+        height: 300px;
+    }
+}
 
-
-
-
+/* Espacement entre les graphiques */
+.col-md-5 {
+    margin: 0 1%;
+    flex: 0 0 48%;
+    max-width: 48%;
+}
+/* historique*/
+        h2 {
+            color: #6a0dad; /* Violet pour le titre */
+        }
+        .history-entry {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            background-color: #f9f9ff; /* Fond clair et légèrement violet pour chaque entrée */
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .history-entry:hover {
+            background-color: #e6e6ff; /* Fond légèrement plus foncé lors du survol */
+        }
+        .history-entry .time {
+            width: 200px;
+            color: #aaa;
+        }
+        .history-entry .title {
+            flex: 1;
+            padding-left: 10px;
+            color: #333;
+        }
+</style>
 </head>
 
 <body>
@@ -244,7 +420,7 @@ body.modal-open {
 
 
         <!-- Sidebar Start -->
-<div class="sidebar pe-4 pb-3">
+    <div class="sidebar pe-4 pb-3">
     <nav class="navbar navbar-light">
         <a href="index.html" class="navbar-brand mx-4 mb-3">
             <h3 class="text-white"><i class="fa fa-hashtag me-2"></i>Boostup</h3>
@@ -310,7 +486,7 @@ body.modal-open {
         </div>
     </nav>
 </div>
-        <!-- Sidebar End -->
+<!-- Sidebar End -->
 
 
         <!-- Content Start -->
@@ -324,68 +500,29 @@ body.modal-open {
                     <i class="fa fa-bars"></i>
                 </a>
                 <div class="navbar-nav align-items-center ms-auto">
-                    <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fa fa-envelope me-lg-2"></i>
-                            <span class="d-none d-lg-inline-flex">Message</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item text-center">See all message</a>
-                        </div>
-                    </div>
+                <li class="nav-item dropdown no-arrow mx-1">
+                   <a class="nav-link dropdown-toggle" href="#" id="historiqueDropdown" role="button"
+                      data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <i class="fas fa-history fa-fw"></i>
+                      <span class="d-none d-lg-inline-flex">Historique</span>
+                   </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
+                       aria-labelledby="historiqueDropdown">
+                        <h6 class="dropdown-header">Historique</h6>
+                           <!-- Nouveau lien qui ouvre le modal -->
+                           <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#historiqueModal">
+                               <i class="fas fa-file-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                      Historique des Ressources
+                                </a>
+                      </div>
+                </li>
+
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                             <i class="fa fa-bell me-lg-2"></i>
                             <span class="d-none d-lg-inline-flex">Notificatin</span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">Profile updated</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">New user added</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">Password changed</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item text-center">See all notifications</a>
-                        </div>
+                        
                     </div>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -470,6 +607,18 @@ body.modal-open {
                         </select>
                     </div>
 
+                    <!-- Type_Acces -->
+                    <div class="col-md-6">
+                        <label for="type_acces" class="form-label fw-bold">Type Acces</label>
+                        <select id="type_acces" name="type_acces" class="form-control shadow-sm">
+                            <option value="">Sélectionner un type</option>
+                            <option value="En ligne">En ligne</option>
+                            <option value="Live">Live</option>
+                            <option value="Pdf">Pdf</option>
+                            <option value="Video">Video</option>
+                        </select>
+                    </div>
+
                     <!-- Description -->
                     <div class="col-12">
                         <label for="description" class="form-label fw-bold">Description</label>
@@ -523,17 +672,6 @@ body.modal-open {
             <button type="submit" name="trier_thematique" class="btn btn-info">
                 <i class="bi bi-sort-alpha-down"></i> Trier par Thématique
             </button>
-
-           
-        <!-- Espace flexible -->
-          <div class="flex-grow-1"></div>
-
-            <!-- Bouton Statistique à droite -->
-            <a href="statistique.php" class="btn btn-warning">
-               <i class="bi bi-pie-chart-fill"></i> Statistique
-            </a>
-
-          </div>
      </form>
     </div>
     <?php
@@ -554,6 +692,7 @@ body.modal-open {
                         <th>Lien</th>
                         <th>Thématique</th>
                         <th>Description</th>
+                        <th>Type Acces</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -572,6 +711,7 @@ body.modal-open {
                             <span class="badge bg-success"><?= htmlspecialchars($ressource['thematique'] ?? 'Non spécifiée') ?></span>
                             </td>
                             <td><?= htmlspecialchars($ressource['description']) ?></td>
+                            <td><?= htmlspecialchars($ressource['type_acces']) ?></td>
                             <td>
                             
                             <button class="btn btn-primary btn-sm me-1 edit-btn" 
@@ -592,6 +732,19 @@ body.modal-open {
                                         <i class="bi bi-trash"></i> Supprimer
                                     </button>
                                 </form>
+
+                                 <!-- Bouton SMS conditionnel -->
+                                 <?php if (
+                                   ($ressource['type'] === 'Cour' || $ressource['type'] === 'Evenement') &&
+                                   ($ressource['type_acces'] === 'En ligne' || $ressource['type_acces'] === 'Live')
+                                     ): ?>
+                                    <form method="POST" action="sms.php" style="display:inline-block; margin-top:5px;">
+                                       <input type="hidden" name="id_ressource" value="<?= $ressource['id_ressource'] ?>">
+                                       <button type="submit" class="btn btn-success btn-sm">
+                                         <i class="bi bi-chat-dots-fill"></i> SMS
+                                       </button>
+                                    </form>
+                                  <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -633,6 +786,26 @@ body.modal-open {
 </div>
 
 <!-- fin de tableau -->
+<!-- Section des statistiques -->
+<div class="container mt-5">
+    <div class="row justify-content-between">
+        <!-- Graphique Circulaire -->
+        <div class="col-md-5 mb-4">
+            <h2 class="stat-title text-center mb-4">Répartition par Type</h2>
+            <div class="chart-container">
+                <canvas id="typeChart1"></canvas>
+            </div>
+        </div>
+
+        <!-- Graphique en Barres -->
+        <div class="col-md-6 mb-4">
+            <h2 class="stat-title text-center mb-4">Répartition par Accès</h2>
+            <div class="chart-container">
+                <canvas id="typeChart2"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Modal d'édition -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -704,15 +877,62 @@ body.modal-open {
 </div>
 <!--FIN model-->
 
+<!-- Modal Historique -->
+<div class="modal fade" id="historiqueModal" tabindex="-1" aria-labelledby="historiqueModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="historiqueModalLabel">Historique des Ressources</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+            <div class="container py-4">
+        <h2 class="mb-4">Historique des Ressources</h2>
+        <input type="text" id="search" class="search-bar form-control mb-3" placeholder="Rechercher dans l'historique...">
 
+        <?php
+        if (!empty($historique)) {
+            foreach ($historique as $index => $log) {
+                if (empty($log)) continue;
+                if (preg_match('/^\[(.*?)\] (.*)/', $log, $matches)) {
+                    $date = $matches[1];
+                    $actionDetails = $matches[2];
+        ?>
+        <!--Ici chaque ligne a bien la classe 'history-entry' -->
+        <div class="history-entry">
+            <div>
+                <div class="text-muted small"><?= htmlspecialchars($date) ?></div>
+                <div class="fw-bold"><?= htmlspecialchars($actionDetails) ?></div>
+            </div>
+            <a href="?delete=<?= $index ?>" class="btn btn-sm btn-danger"
+               onclick="return confirm('Supprimer cette entrée ?')">🗑️</a>
+        </div>
+        <?php
+                }
+            }
+        } else {
+            echo "<p class='text-muted'>Aucun historique disponible.</p>";
+        }
+        ?>
+    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Fin du Modal Historique -->
+
+
+<!-- Fin du Modal Historique -->
 
             </div>
 
         </div>
             
     </div-->
+
+
      
-        <!-- Content End -->
+<!-- Content End -->
 
 
         <!-- Back to Top -->
@@ -730,12 +950,95 @@ body.modal-open {
     <script src="lib/tempusdominus/js/moment.min.js"></script>
     <script src="lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+    
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
 
     <script src="script.js"></script>
 
+     <!-- Ajout de Chart.js -->
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Pie Chart
+    const ctx1 = document.getElementById('typeChart1').getContext('2d');
+    new Chart(ctx1, {
+        type: 'pie',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                data: <?= json_encode($data) ?>,
+                backgroundColor: <?= json_encode($bgColors) ?>,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Répartition par type de ressource'
+                }
+            }
+        }
+    });
+
+    // Bar Chart
+     
+    const ctx2 = document.getElementById('typeChart2').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode(array_values($thematiquesBar)) ?>,
+            datasets: <?= json_encode($datasets) ?>
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: false,
+                    title: {
+                        display: true,
+                        text: 'Thématiques'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre de ressources'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Répartition par type d\'accès et thématique'
+                }
+            }
+        }
+    });
+});
+</script>
+<script>
+    const search = document.getElementById("search");
+    search.addEventListener("keyup", function () {
+        const query = this.value.toLowerCase();
+        document.querySelectorAll('.history-entry').forEach(entry => {
+            entry.style.display = entry.textContent.toLowerCase().includes(query) ? 'flex' : 'none';
+        });
+    });
+</script>
 <script>
 function validerFormulaire(event) {
     event.preventDefault();
@@ -823,64 +1126,6 @@ document.querySelectorAll('.edit-btn').forEach(button => {
 });
 
 // Validation du formulaire de modification
-/*document.getElementById('editForm').addEventListener('submit', function(e) {
-    // Récupération des champs
-    const titre = document.getElementById('edit_titre');
-    const lien = document.getElementById('edit_lien');
-    const description = document.getElementById('edit_description');
-    const type = document.getElementById('edit_type');
-    const thematique = document.getElementById('edit_thematique');
-
-    // Réinitialiser les messages d’erreur
-    document.querySelectorAll('.form-text.text-danger').forEach(el => el.textContent = '');
-    document.querySelectorAll('input, select, textarea').forEach(el => el.classList.remove('is-invalid'));
-
-    let valid = true;
-
-    // Type
-    if (type && type.value === '') {
-        type.classList.add('is-invalid');
-        document.getElementById('type_error').textContent = 'Veuillez sélectionner un type.';
-        valid = false;
-    }
-
-    // Titre
-    if (titre.value.trim().length < 3) {
-        titre.classList.add('is-invalid');
-        document.getElementById('titre_error').textContent = 'Le titre doit contenir au moins 3 caractères.';
-        valid = false;
-    }
-
-    // Lien
-    const regex = /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i;
-    if (!regex.test(lien.value.trim())) {
-        lien.classList.add('is-invalid');
-        document.getElementById('lien_error').textContent = 'Veuillez entrer un lien valide.';
-        valid = false;
-    }
-
-    // Thématique
-    if (thematique && thematique.value === '') {
-        thematique.classList.add('is-invalid');
-        document.getElementById('thematique_error').textContent = 'Veuillez choisir une thématique.';
-        valid = false;
-    }
-
-    // Description
-    if (description.value.trim().length < 10) {
-        description.classList.add('is-invalid');
-        document.getElementById('description_error').textContent = 'La description doit comporter au moins 10 caractères.';
-        valid = false;
-    }
-
-    if (!valid) {
-        e.preventDefault(); // Empêche l'envoi si un champ est invalide
-    }
-});*/
-
-// Ajoutez cette partie dans la section <script> existante
-
-// Validation du formulaire de modification
 document.getElementById('editForm').addEventListener('submit', function(e) {
     // Empêcher l'envoi par défaut
     e.preventDefault();
@@ -955,7 +1200,6 @@ document.getElementById('editModal').addEventListener('hidden.bs.modal', functio
     document.body.style.paddingRight = '';
 });
 </script>
-
 </body>
 
 </html>

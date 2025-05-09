@@ -26,7 +26,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Enregistrer le titre dans notification.txt après l'ajout
         $notifFile = "notification.txt";
-        file_put_contents($notifFile, $titre);
+        // Par (pour formater comme la ressource) :
+         $message = "📢 Nouvelle thématique : $titre";
+         file_put_contents($notifFile, $message);
 
         header("Location: thematique.php");
         exit();

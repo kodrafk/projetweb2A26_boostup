@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -24,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $titre = $_POST['titre'] ?? '';
     $lien = $_POST['lien'] ?? '';
     $description = $_POST['description'] ?? '';
+    $type_acces = $_POST['type_acces'] ?? '';
     $id_thematique = $_POST['id_thematique'] ?? '';
 
     $errors = [];
@@ -32,10 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($titre)) $errors[] = "Le titre est obligatoire.";
     if (empty($lien)) $errors[] = "Le lien est obligatoire.";
     if (empty($description)) $errors[] = "La description est obligatoire.";
+    if (empty($type_acces)) $errors[] = "La type acces est obligatoire.";
     if (empty($id_thematique)) $errors[] = "La thématique est obligatoire.";
 
     if (empty($errors)) {
-        $ressource = new Ressource(null, $type, $titre, $lien, $description, $id_thematique);
+        $ressource = new Ressource(null, $type, $titre, $lien, $description,$type_acces, $id_thematique);
         $ressourceC = new RessourceC();
         $ressourceC->ajouterRessource($ressource);
 
@@ -43,6 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $thematiqueC = new ThematiqueC(); // Créer une instance de ThematiqueC
             $thematique = $thematiqueC->getThematiqueById($id_thematique); // Appeler la méthode
             $thematiqueTitre = $thematique['titre']; // Extraire le titre
+
+
+            // Enregistrer dans le fichier de notification des ressources
+            if (($type == 'Cour' || $type == 'Evenement') && ($type_acces == 'En ligne' || $type_acces == 'Live')) {
+               $message = "📢 Démarrage $type $type_acces : $titre (Thématique: $thematiqueTitre) - Durée 20min";
+               file_put_contents("notificationR.txt", $message);
+            }
+
 
 
           // Envoi de l'email
@@ -73,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                <p style="color: #111111;"><strong>Lien :</strong> <a href="' . htmlspecialchars($lien) . '" style="color: #3498db;">' . htmlspecialchars($lien) . '</a></p>
 
                <p style="color: #111111;"><strong>Thématique :</strong> ' . htmlspecialchars($thematiqueTitre) . '</p>
+               <p style="color: #111111;"><strong>Type Acces :</strong> ' . htmlspecialchars($type_acces) . '</p>
                <p style="color: #111111;"><strong>Description :</strong></p>
                <div style="background-color: #fff; border: 1px solid #ccc; padding: 10px; border-radius: 5px; color: #111111;">
                ' . nl2br(htmlspecialchars($description)) . '

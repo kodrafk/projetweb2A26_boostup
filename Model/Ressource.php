@@ -7,16 +7,18 @@ class Ressource {
     private ?string $titre = null;
     private ?string $lien = null;
     private ?string $description = null;
+    private $type_acces = null;
     private $id_thematique;
 
 
-    public function __construct($id ,$ty, $t, $l, $des,  $id_thematique ) {
+    public function __construct($id ,$ty, $t, $l, $des, $type_acces,  $id_thematique ) {
         $this->id_ressource = $id;
         $this->type = $ty;
         $this->titre = $t;
         $this->lien = $l;
         $this->description = $des;
-        $this->id_thematique = $id_thematique;  // Initialiser l'ID thématique
+        $this->type_acces = $type_acces;
+        $this->id_thematique = $id_thematique; 
        
     }
 
@@ -70,5 +72,21 @@ class Ressource {
     public function setIdThematique($id_thematique) {
         $this->id_thematique = $id_thematique;
         return $this;
+    }
+
+    
+    // Getter pour type_acces
+    public function getTypeAcces() {
+        return $this->type_acces;
+    }
+
+    // Setter pour type_acces
+    public function setTypeAcces($type_acces) {
+        $validTypesAcces = ['Pdf', 'En ligne', 'Live', 'Video']; 
+        if (in_array($type_acces, $validTypesAcces)) {
+            $this->type_acces = $type_acces;
+        } else {
+            throw new Exception("Type d'accès invalide");
+        }
     }
 }

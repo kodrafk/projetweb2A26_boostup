@@ -61,6 +61,11 @@ if (isset($_SESSION['alert'])) {
 
 ?>
 
+<?php
+// Vérifier s’il y a au moins un signalement
+$nbSignalements = count(array_filter($thematiques, fn($t) => $t['signalee'] == 1));
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -94,7 +99,7 @@ if (isset($_SESSION['alert'])) {
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
 
-    <style>
+<style>
         .is-invalid {
     border-color: red;
      }
@@ -215,6 +220,19 @@ if (isset($_SESSION['alert'])) {
     .dropdown-menu {
         background-color: #7d76ff !important;
     }
+
+    /* notification*/
+.badge.bg-danger {
+    animation: pulse 1.5s infinite;
+    margin-top: 20px;
+    margin-left: -15px;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(255, 0, 0, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
 </style>
 </head>
 
@@ -315,68 +333,55 @@ if (isset($_SESSION['alert'])) {
                             <i class="fa fa-envelope me-lg-2"></i>
                             <span class="d-none d-lg-inline-flex">Message</span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <div class="d-flex align-items-center">
-                                    <img class="rounded-circle" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                                    <div class="ms-2">
-                                        <h6 class="fw-normal mb-0">Jhon send you a message</h6>
-                                        <small>15 minutes ago</small>
-                                    </div>
-                                </div>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item text-center">See all message</a>
-                        </div>
                     </div>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            <i class="fa fa-bell me-lg-2"></i>
-                            <span class="d-none d-lg-inline-flex">Notificatin</span>
+                      <a href="#" class="nav-link dropdown-toggle position-relative" data-bs-toggle="dropdown">
+                         <i class="fa fa-bell me-lg-2"></i>
+                          <span class="d-none d-lg-inline-flex">Notification</span>
+                          <?php
+                             // Compter le nombre de signalements
+                             $nbSignalements = 0;
+                             $thematiquesSignalees = [];
+                             foreach ($thematiques as $t) {
+                             if ($t['signalee'] == 1) {
+                               $nbSignalements++;
+                               $thematiquesSignalees[] = $t;
+                               }
+                             }
+                           ?>
+                         <?php if ($nbSignalements > 0): ?>
+                               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6em;">
+                                <?= $nbSignalements ?>
+                                  <span class="visually-hidden">Signalements non lus</span>
+                                  </span>
+                         <?php endif; ?>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">Profile updated</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">New user added</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item">
-                                <h6 class="fw-normal mb-0">Password changed</h6>
-                                <small>15 minutes ago</small>
-                            </a>
-                            <hr class="dropdown-divider">
-                            <a href="#" class="dropdown-item text-center">See all notifications</a>
-                        </div>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded shadow p-3" style="min-width: 320px; max-height: 400px; overflow-y: auto;">
+                          <?php if ($nbSignalements > 0): ?>
+                                <?php foreach ($thematiquesSignalees as $thematique): ?>
+                                   <div class="p-3 mb-3 bg-white rounded border border-warning shadow-sm">
+                                       <p class="mb-2 text-dark">
+                                           <strong>🔔 Signalement :</strong><br>
+                                               Il ya un demande de signaler:
+                                        </p>
+                                       <form action="actionSignalement.php" method="POST" class="d-flex gap-2 mt-2">
+                                           <input type="hidden" name="id_thematique" value="<?= $thematique['id_thematique'] ?>">
+                                             <button type="submit" name="action" value="flooter" class="btn btn-danger btn-sm w-50">🚫 Flouter</button>
+                                             <button type="submit" name="action" value="refuser" class="btn btn-success btn-sm w-50">✅ Refuser</button>
+                                       </form>
+                                    </div>
+                               <?php endforeach; ?>
+                           <?php else: ?>
+                              <p class="text-center text-muted mb-0">Aucune notification</p>
+                          <?php endif; ?>
+                         </div>
                     </div>
+
+
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                             <img class="rounded-circle me-lg-2" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                            <span class="d-none d-lg-inline-flex">John Doe</span>
+                            <span class="d-none d-lg-inline-flex">Bouthayna labidi</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                             <a href="#" class="dropdown-item">My Profile</a>
@@ -473,14 +478,7 @@ if (isset($_SESSION['alert'])) {
                 <i class="bi bi-sort-alpha-down"></i> Trier par Thématique
             </button>
 
-            <!-- Espace flexible -->
-          <div class="flex-grow-1"></div>
-
-               <!-- Bouton Statistique à droite -->
-               <a href="statistique.php" class="btn btn-warning">
-                  <i class="bi bi-pie-chart-fill"></i> Statistique
-                </a>
-         </div> 
+            
         </div>                
     </form>
     <?php
@@ -499,7 +497,6 @@ if (isset($_SESSION['alert'])) {
                     <th>Titre</th>
                     <th>Description</th>
                     <th>Actions</th>
-                    <th>Etat</th>
                 </tr>
             </thead>
             <tbody>
@@ -526,18 +523,6 @@ if (isset($_SESSION['alert'])) {
                                             </button>
                                     </form>
                                 </div>
-                            </td>
-
-                            <td>
-                                    <div>
-                                       <?php if ($thematique['signalee'] == 1): ?>
-                                          <form action="actionSignalement.php" method="POST">
-                                             <input type="hidden" name="id_thematique" value="<?= $thematique['id_thematique'] ?>">
-                                                   <button type="submit" name="action" value="flooter" class="btn btn-warning btn-sm">Flooter</button>
-                                                   <button type="submit" name="action" value="refuser" class="btn btn-secondary btn-sm">Refuser</button>
-                                            </form>
-                                        <?php endif; ?>
-                                    </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -631,47 +616,6 @@ if (isset($_SESSION['alert'])) {
 <script src="js/main.js"></script>
 </body>
 <script>
-// Fonction de validation du formulaire
-/*function validerFormulaire(event) {
-    event.preventDefault();
-
-    // Récupérer les champs du formulaire
-    const titre = document.getElementById('titre');
-    const description = document.getElementById('description');
-
-    // Réinitialiser les messages d'erreur et les classes invalides
-    document.querySelectorAll('.form-text').forEach(el => el.textContent = '');
-    document.querySelectorAll('input, select, textarea').forEach(input => input.classList.remove('is-invalid'));
-
-    let valid = true;
-
-    // Validation pour le champ 'titre' : minimum 3 caractères
-    if (titre.value.trim().length < 3) {
-        document.getElementById('titre_error').textContent = 'Le titre doit contenir au moins 3 caractères.';
-        titre.classList.add('is-invalid');
-        valid = false;
-    }
-
-    // Validation pour le champ 'description' : minimum 10 caractères
-    if (description.value.trim().length < 10) {
-        document.getElementById('description_error').textContent = 'La description doit comporter au moins 10 caractères.';
-        description.classList.add('is-invalid');
-        valid = false;
-    }
-
-    // Si toutes les validations sont passées, soumettre le formulaire
-    if (valid) {
-        document.getElementById("travelOfferForm").submit();
-    }
-}
-
-// Ajout de l'écouteur d'événements au formulaire lorsque le DOM est prêt
-document.addEventListener("DOMContentLoaded", function() {
-    const form = document.getElementById("travelOfferForm");
-    if (form) {
-        form.addEventListener("submit", validerFormulaire);
-    }
-});*/
 // Validation formulaire principal
 document.getElementById("travelOfferForm")?.addEventListener("submit", function(e) {
     e.preventDefault();

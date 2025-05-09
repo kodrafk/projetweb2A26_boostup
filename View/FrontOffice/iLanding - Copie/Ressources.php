@@ -1,53 +1,77 @@
 <?php
 require_once('C:/xampp/htdocs/Ressources/config.php');
 require_once($_SERVER['DOCUMENT_ROOT'] . '/Ressources/Controller/ThematiqueC.php');
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'signaler') {
-
-  $id = $_POST['id_thematique'];
-  $conn = Config::getConnexion(); 
-  $stmt = $conn->prepare("UPDATE thematique SET signalee = 1 WHERE id_thematique = ?");
-  $stmt->execute([$id]);
-  exit;
+    $id = $_POST['id_thematique'];
+    $conn = Config::getConnexion(); 
+    $stmt = $conn->prepare("UPDATE thematique SET signalee = 1 WHERE id_thematique = ?");
+    $stmt->execute([$id]);
+    exit;
 }
-
 
 $conn = Config::getConnexion();
 
-// Récupérer toutes les thématiques
-//$stmt = $conn->query("SELECT * FROM thematique");
+// Récupération des thématiques avec statut flouté
 $stmt = $conn->query("SELECT *, 
-     (CASE WHEN flouter = 1 THEN 1 ELSE 0 END) AS est_floute 
-     FROM thematique");
+    (CASE WHEN flouter = 1 THEN 1 ELSE 0 END) AS est_floute 
+    FROM thematique");
 $thematiques = $stmt->fetchAll();
 
-// Définir le chemin du fichier de notification
+// Gestion des notifications
 $notifMessage = "";
-$notifFile = "../../BackOffice/Template de backOffice Luna/notification.txt"; // Chemin corrigé
+$notifThematiqueFile = "../../BackOffice/Template de backOffice Luna/notification.txt";
+$notifRessourceFile = "../../BackOffice/Template de backOffice Luna/notificationR.txt";
 
-// Vérifier si le fichier de notification existe et lire le titre
-if (file_exists($notifFile)) {
-    $titre = trim(file_get_contents($notifFile));
-    if (!empty($titre)) {
-        $notifMessage = "📢 Une nouvelle thématique a été ajoutée : $titre";
+// Vérification des dates de modification
+$timeThematique = file_exists($notifThematiqueFile) ? filemtime($notifThematiqueFile) : 0;
+$timeRessource = file_exists($notifRessourceFile) ? filemtime($notifRessourceFile) : 0;
+
+// Détermination de la dernière notification
+if ($timeThematique > $timeRessource) {
+    $contenuThematique = trim(file_get_contents($notifThematiqueFile));
+    if (!empty($contenuThematique)) {
+        $notifMessage = "📢 Nouvelle thématique : $contenuThematique";
+    }
+} elseif ($timeRessource > 0) {
+    $contenuRessource = trim(file_get_contents($notifRessourceFile));
+    if (!empty($contenuRessource)) {
+        $notifMessage = $contenuRessource;
     }
 }
 
-// Récupération du filtre
-$filtre = $_POST['titre_filtre'] ?? '';
-
-// Si un filtre est appliqué
-if(!empty($filtre)) {
-  $thematiqueController = new ThematiqueC();
-  $thematiques = $thematiqueController->filtrerParTitre($filtre);
-} else {
-  // Requête par défaut
-  $stmt = $conn->query("SELECT *, 
-       (CASE WHEN flouter = 1 THEN 1 ELSE 0 END) AS est_floute 
-       FROM thematique");
-  $thematiques = $stmt->fetchAll();
+// Nettoyage des fichiers de notification après lecture
+if (!empty($notifMessage)) {
+  file_put_contents($notifThematiqueFile, "");
+  file_put_contents($notifRessourceFile, "");
 }
 
-?>
+// Gestion du filtre
+$filtre = $_POST['titre_filtre'] ?? '';
+
+if(!empty($filtre)) {
+    $thematiqueController = new ThematiqueC();
+    $thematiques = $thematiqueController->filtrerParTitre($filtre);
+} else {
+    $stmt = $conn->query("SELECT *, 
+        (CASE WHEN flouter = 1 THEN 1 ELSE 0 END) AS est_floute 
+        FROM thematique");
+    $thematiques = $stmt->fetchAll();
+}
+
+// Gestion des notifications de ressources
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['type']) && isset($_POST['type_acces'])) {
+    $type = $_POST['type'];
+    $type_acces = $_POST['type_acces'];
+    $titre_ressource = $_POST['titre'] ?? '';
+
+    if (($type == 'Cour' || $type == 'Evenement') && ($type_acces == 'En ligne' || $type_acces == 'Live')) {
+        $message = "Le $type $type_acces '$titre_ressource' a démarré - Durée 20min";
+        file_put_contents($notifRessourceFile, $message);
+    }
+}
+?> 
+
 
 <!-- Le reste du HTML reste inchangé -->
 <!DOCTYPE html>
@@ -78,6 +102,44 @@ if(!empty($filtre)) {
 
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
+  
+   <!-- Bootstrap CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot IA</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded&family=Material+Symbols+Outlined">
+  <style>
+    /* Chatbot Style */
+    .chatbot-popup {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 40px;
+      width: 350px;
+      height: 500px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+    .chatbot-popup.show-chatbot {
+      display: block;
+    }
+    .chat-header {
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      border-radius: 10px 10px 0 0;
+    }
+    #close-chatbot {
+      background: none;
+      border: none;
+      color: white;
+      float: right;
+    }
+  </style>
 
   <style>
     body {
@@ -100,7 +162,7 @@ if(!empty($filtre)) {
       z-index: 10;
     }
 
-    .feature-box.orange { background: #ff7f50; }
+    .feature-box.orange { background: #1e90ff; }
     .feature-box.blue { background: #1e90ff; }
     .feature-box.green { background: #28a745; }
     .feature-box.red { background: #dc3545; }
@@ -237,7 +299,7 @@ if(!empty($filtre)) {
   top: 50px;
   right: 20px;
   width: 320px;
-  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  background: linear-gradient(135deg, #8000ff 0%);
   border-radius: 15px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
   padding: 20px;
@@ -314,6 +376,7 @@ if(!empty($filtre)) {
 }
 
 </style>
+
 </head>
 
 <body class="index-page">
@@ -366,24 +429,23 @@ if(!empty($filtre)) {
       </nav>
 
       <!-- Notification, Message, and Sign out -->
-       <div class="d-flex align-items-center gap-3">
-
-        <a href="#" class="text-dark position-relative" onclick="toggleNotif()" id="bellIcon">
-           <i class="bi bi-bell" style="font-size: 22px;"></i>
-           <span id="notif-circle" class="notif-circle"></span>
-        </a>
+      <div class="d-flex align-items-center gap-3">
+          <a href="#" class="text-dark position-relative" onclick="toggleNotif()" id="bellIcon">
+            <i class="bi bi-bell" style="font-size: 22px;"></i>
+            <span id="notif-circle" class="notif-circle"></span>
+          </a>
 
         <div id="notifBox">
-           <div class="notif-header">
-              <div class="notif-title">Nouveauté ! 🎉</div>
-                <div class="close-btn" onclick="closeNotif()">×</div>
+            <div class="notif-header">
+               <div class="notif-title">Nouveauté ! 🎉</div>
+               <div class="close-btn" onclick="closeNotif()">×</div>
             </div>
             <div class="notif-body">
-                <p id="notifMessage"></p>
-                 <small class="text-muted">Cliquez pour explorer</small>
-           </div>
-          <audio id="notifSound" src="assets/sounds/notification.mp3" preload="auto"></audio>
-        </div>
+               <p id="notifMessage"></p>
+                <small class="text-muted">Cliquez pour explorer</small>
+            </div>
+          </div>
+       </div>
 
 
         <!-- Sign out button -->
@@ -620,10 +682,18 @@ if(!empty($filtre)) {
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
+  <!-- script chatbot IA -->
+   <!--script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script-->
+  <!--script src="/Ressources/View/FrontOffice/iLanding - Copie/AI-Chatbot-main/script.js"></script-->
+  <!-- jQuery et Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
   <!-- Ton contenu HTML ici -->
 
-  <script>
-document.querySelectorAll('.btn-like, .btn-dislike').forEach(btn => {
+<script>
+ document.querySelectorAll('.btn-like, .btn-dislike').forEach(btn => {
   btn.addEventListener('click', function () {
     const card = this.closest('[data-id]');
     const id = card.dataset.id;
@@ -661,34 +731,42 @@ document.querySelectorAll('.btn-like, .btn-dislike').forEach(btn => {
 
 <script>
 function toggleNotif() {
-  const notifBox = document.getElementById("notifBox");
-  const bellIcon = document.getElementById("bellIcon");
+    const notifBox = document.getElementById("notifBox");
+    const bellIcon = document.getElementById("bellIcon");
   
-  if (notifBox.style.display === "block") {
-    notifBox.style.display = "none";
-    bellIcon.style.transform = "rotate(0deg)";
-  } else {
-    notifBox.style.display = "block";
-    bellIcon.style.transform = "rotate(-20deg)";
-    document.getElementById("notif-circle").style.display = "none";
-    document.getElementById("notifSound").play();
-  }
+    if (notifBox.style.display === "block") {
+        notifBox.style.display = "none";
+        bellIcon.style.transform = "rotate(0deg)";
+    } else {
+        notifBox.style.display = "block";
+        bellIcon.style.transform = "rotate(-20deg)";
+        document.getElementById("notif-circle").style.display = "none";
+        document.getElementById("notifSound").play();
+    }
 }
 
 function closeNotif() {
-  document.getElementById("notifBox").style.display = "none";
-  document.getElementById("bellIcon").style.transform = "rotate(0deg)";
+    document.getElementById("notifBox").style.display = "none";
+    document.getElementById("bellIcon").style.transform = "rotate(0deg)";
 }
 
 // Vérifier les nouvelles notifications au chargement
 document.addEventListener('DOMContentLoaded', function() {
-  <?php if(!empty($notifMessage)): ?>
-    document.getElementById("notif-circle").style.display = "block";
-    document.getElementById("notifMessage").innerHTML = "<?php echo $notifMessage; ?>";
-  <?php endif; ?>
+    // Notification de thématique
+    <?php if(!empty($notifMessage)): ?>
+        document.getElementById("notif-circle").style.display = "block";
+        document.getElementById("notifMessage").innerHTML = "<?php echo addslashes($notifMessage); ?>";
+    <?php endif; ?>
+
+    // Notification de ressource
+    <?php if(!empty($notifRessourceMessage)): ?>
+        // Ajouter le message de ressource à la notification existante
+        const notifBody = document.getElementById("notifMessage");
+        notifBody.innerHTML += "<br><strong>Ressource :</strong> <?php echo $notifRessourceMessage; ?>";
+    <?php endif; ?>
 });
 
-//pou le button signaler
+//pour le button signaler
 document.querySelectorAll('.btn-signaler').forEach(button => {
     button.addEventListener('click', function () {
         const id = this.getAttribute('data-id');
@@ -706,11 +784,381 @@ document.querySelectorAll('.btn-signaler').forEach(button => {
     });
 });
 </script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant Ressources</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    /* Autres styles précédemment définis pour le chatbot */
+    .chatbot-launcher {
+        position: fixed;
+        bottom: 20px;
+        right: 10px;
+        background: #8000ff;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        z-index: 1000;
+    }
+
+    .chat-container {
+        border-radius: 10px;
+        max-width: 450px;
+        height: 70vh;
+    }
+
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 15px;
+        background: #8000ff;
+        color: white;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .chat-avatar {
+        display: flex;
+        align-items: center;
+    }
+
+    .chat-avatar img {
+        width: 40px;
+        height: 40px;
+        border-radius: 20%;
+        margin-right: 10px;
+    }
+
+    .chat-body {
+        flex: 1;
+        padding: 15px;
+        background: #ECE5DD;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-height: 300px;
+    }
+
+    .message {
+        max-width: 80%;
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .user-message {
+        margin-left: auto;
+    }
+
+    .bot-message .bubble {
+        background: white;
+        border-radius: 15px 15px 15px 4px;
+    }
+
+    .user-message .bubble {
+        background: #8000ff;
+        border-radius: 15px 15px 4px 15px;
+    }
+
+    .message-input {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        background: white;
+        padding: 10px;
+        border-radius: 25px;
+        margin-top: 10px;
+    }
+
+    .typing-indicator {
+        display: inline-flex;
+        gap: 3px;
+        padding: 8px 12px;
+    }
+
+    .typing-indicator span {
+        width: 6px;
+        height: 6px;
+        background: #666;
+        border-radius: 50%;
+        animation: typing 1s infinite ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bubble {
+    position: relative;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 10px 30px 10px 10px;
+    margin: 5px 0;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.btn-ecouter {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.btn-ecouter img {
+    width: 10px;
+    height: 10px;
+}
+
+.emoji-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+            padding: 10px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 10px;
+            display: none;
+        }
+</style>
+</head>
+<body>
+
+<!-- Bouton pour ouvrir le chatbot -->
+<button id="askAIButton" class="chatbot-launcher">💬 Assistant Ressources</button>
+
+<!-- Modal chatbot -->
+<div class="modal fade" id="aiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content chat-container">
+            <div class="chat-header">
+                <div class="chat-avatar">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" alt="Bot">
+                </div>
+                <h5>ChatBot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="chat-body" id="chatWindow"></div>
+
+            <div class="chat-footer" style="padding: 15px;">
+                <div class="message-input">
+                    <button class="btn btn-light" onclick="toggleEmojiPicker()">😊</button>
+                    <input type="text" id="questionInput" class="form-control" placeholder="Écrivez votre message...">
+                    <button class="btn btn-secondary" id="micButton">🎤</button>
+                    <button class="btn btn-success" id="askButton">
+                        <svg width="24" height="24" viewBox="0 0 24 24" style="fill: white;">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="emoji-picker" id="emojiPicker">
+                    <span onclick="addEmoji('😀')">😀</span>
+                    <span onclick="addEmoji('😊')">😊</span>
+                    <span onclick="addEmoji('👍')">👍</span>
+                    <span onclick="addEmoji('❤️')">❤️</span>
+                    <span onclick="addEmoji('🎉')">🎉</span>
+                    <span onclick="addEmoji('🙏')">🙏</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const API_KEY = 'AIzaSyC_-H3O3VD9hrpZqRv3gpc40qxDIAbYILo';
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
+// Ouvrir le chatbot
+document.getElementById('askAIButton').addEventListener('click', () => {
+    new bootstrap.Modal(document.getElementById('aiModal')).show();
+});
+
+/* 1 ere methode il repondre sur toute les questionne */
+// Envoyer une question
+/*document.getElementById('askButton').addEventListener('click', sendQuestion);
+
+function sendQuestion() {
+    const input = document.getElementById('questionInput');
+    const question = input.value.trim();
+    const chatWindow = document.getElementById('chatWindow');
+
+    if (!question) return;
+
+    chatWindow.innerHTML += `
+        <div class="message user-message">
+            <div class="bubble">${question}</div>
+        </div>
+        <div class="message bot-message" id="typing">
+            <div class="bubble typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>`;
+    input.value = '';
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: question }] }]
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('typing').remove();
+        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Je n’ai pas compris.';
+        afficherReponseBot(reply);
+    })
+    .catch(() => {
+        document.getElementById('typing').remove();
+        afficherReponseBot("Erreur lors de la réponse.");
+    });
+}*/
+/* fin methode 1*/
+
+/* 2 eme methode */
+
+// Envoyer une question
+document.getElementById('askButton').addEventListener('click', sendQuestion);
+
+async function sendQuestion() {
+    const input = document.getElementById('questionInput');
+    const question = input.value.trim();
+    const chatWindow = document.getElementById('chatWindow');
+
+    if (!question) return;
+
+    // Message utilisateur
+    chatWindow.innerHTML += `
+        <div class="message user-message">
+            <div class="bubble">${question}</div>
+        </div>
+        <div class="message bot-message" id="typing">
+            <div class="bubble typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>`;
+    input.value = '';
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    try {
+        const systemPrompt = `Tu es un assistant pour une plateforme de ressources éducatives liées à l'entrepreneuriat. 
+        Réponds uniquement si la question concerne : contenus d'apprentissage, vidéos, événements enregistrés, 
+        guides ou thématiques liées aux projets et startups. Sinon, réponds :
+        "Je suis un assistant dédié à la gestion de ressources entrepreneuriales uniquement." 
+        La question est : ${question}`;
+
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: systemPrompt }] }]
+            })
+        });
+
+        const data = await response.json();
+        document.getElementById('typing').remove();
+
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Je n’ai pas compris.';
+        afficherReponseBot(reply);
+    } catch (error) {
+        document.getElementById('typing').remove();
+        afficherReponseBot("Erreur lors de la réponse.");
+    }
+}
+
+/*fin deuxieme methode */
+
+let currentUtterance = null;
+
+function afficherReponseBot(message) {
+    const chatWindow = document.getElementById('chatWindow');
+
+    const messageBot = document.createElement('div');
+    messageBot.classList.add('message', 'bot-message');
+
+    const bubble = document.createElement('div');
+    bubble.classList.add('bubble');
+    bubble.textContent = message;
+
+    // Bouton écouter
+    const boutonEcouter = document.createElement('button');
+    boutonEcouter.classList.add('btn-ecouter');
+    boutonEcouter.innerHTML = '<img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" alt="Écouter">';
+
+    bubble.appendChild(boutonEcouter);
+    messageBot.appendChild(bubble);
+    chatWindow.appendChild(messageBot);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    boutonEcouter.addEventListener('click', function () {
+        if (currentUtterance && speechSynthesis.speaking) {
+            speechSynthesis.cancel(); // Arrête la lecture si déjà en cours
+            currentUtterance = null;
+        } else {
+            currentUtterance = new SpeechSynthesisUtterance(message);
+            currentUtterance.lang = 'fr-FR';
+            speechSynthesis.speak(currentUtterance);
+        }
+    });
+}
 
 
+// Emoji
+function toggleEmojiPicker() {
+    const picker = document.getElementById('emojiPicker');
+    picker.style.display = picker.style.display === 'grid' ? 'none' : 'grid';
+}
 
+function addEmoji(emoji) {
+    document.getElementById('questionInput').value += emoji;
+}
 
+// 🎤 Reconnaissance vocale
+const micButton = document.getElementById('micButton');
+let recognition;
+if ('webkitSpeechRecognition' in window) {
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = 'fr-FR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
+    recognition.onresult = event => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('questionInput').value = transcript;
+    };
+
+    recognition.onerror = () => alert('Erreur de reconnaissance vocale');
+    recognition.onend = () => micButton.disabled = false;
+
+    micButton.addEventListener('click', () => {
+        micButton.disabled = true;
+        recognition.start();
+    });
+} else {
+    micButton.disabled = true;
+    micButton.title = "Reconnaissance vocale non supportée";
+}
+</script>
 </body>
 
 </html>
