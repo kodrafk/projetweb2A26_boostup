@@ -1,5 +1,5 @@
 <?php
-require_once('../../../config.php');
+/*require_once('../../../config.php');
 
 // Identifiants Twilio
 $accountSid = 'AC23de7f15176988936eec05fa811c7590';
@@ -82,4 +82,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo 'Erreur : ' . $e->getMessage();
     }
 }
-?>
+?>*/
