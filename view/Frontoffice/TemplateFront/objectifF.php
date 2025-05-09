@@ -22,6 +22,16 @@ $projetCollaboratifCount = count(array_filter($allObjectifs, function ($objectif
     return isset($objectif['status']) && !empty($objectif['status']) && $objectif['status'] === 'projet collaboratif';
 }));
 
+// Calculer les objectifs proches de l'échéance
+$objectifsProches = array_filter($allObjectifs, function ($objectif) {
+    if (!isset($objectif['date_limite']) || empty($objectif['date_limite'])) {
+        return false; // Ignorer les objectifs sans date limite
+    }
+    $dateLimite = strtotime($objectif['date_limite']);
+    $aujourdhui = strtotime(date('Y-m-d'));
+    return $dateLimite >= $aujourdhui && $dateLimite <= strtotime('+7 days', $aujourdhui);
+});
+
 // Récupérer les objectifs pour l'affichage (avec recherche et tri)
 $query = $pdo->query("SELECT * FROM objectif");
 $objectifs = $query->fetchAll(PDO::FETCH_ASSOC);
@@ -49,6 +59,10 @@ if ($action === 'sort') {
         });
     }
 }
+
+// Récupérer les objectifs terminés pour l'historique
+$queryHistorique = $pdo->query("SELECT * FROM objectif WHERE status = 'terminé'");
+$historiqueObjectifs = $queryHistorique->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -152,18 +166,6 @@ if ($action === 'sort') {
           </form>
         </div>
 
-        <!-- Objectifs proches de l'échéance -->
-        <div id="proches-echeance" class="mb-4">
-          <h5 class="text-center">Objectifs Proches de l'Échéance</h5>
-          <ul class="list-group">
-            <?php foreach ($objectifsProches ?? [] as $objectif): ?>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <?= htmlspecialchars($objectif['titre']) ?>
-                <span class="badge bg-danger"><?= htmlspecialchars($objectif['date_limite']) ?></span>
-              </li>
-            <?php endforeach; ?>
-          </ul>
-        </div>
 
         <!-- Liste des objectifs -->
         <div id="resultats" class="row gy-4">
@@ -178,7 +180,6 @@ if ($action === 'sort') {
                     <p class="card-text"><small class="text-muted">Statut : 
                         <?= isset($objectif['status']) && !empty($objectif['status']) ? htmlspecialchars($objectif['status']) : 'Non défini' ?>
                     </small></p>
-                    <a href="supprimerObjectifF.php?id=<?= $objectif['id'] ?>" class="btn btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer cet objectif ?')">Supprimer</a>
                   </div>
                 </div>
               </div>
@@ -192,82 +193,41 @@ if ($action === 'sort') {
       </div>
     </section>
 
-    <!-- Statistiques -->
-    <section id="statistiques" class="statistiques section">
-      <div class="container" data-aos="fade-up">
-        <h2 class="text-center mb-4">Statistiques</h2>
+    <!-- Dans la section Statistiques de votre objectif.php, remplacez le code actuel par ceci: -->
+
+<!-- Statistiques -->
+<section id="statistiques" class="statistiques section">
+  <div class="container" data-aos="fade-up">
+    <h2 class="text-center mb-4">Statistiques</h2>
+    <div class="row">
+      <div class="col-md-6">
         <div class="row text-center">
-          <div class="col-md-4">
+          <div class="col-md-6">
             <h5>Total Objectifs</h5>
             <p><?= $totalObjectifs ?></p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <h5>Freelance</h5>
             <p><?= $freelanceCount ?></p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <h5>Stage</h5>
             <p><?= $stageCount ?></p>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <h5>Projet Collaboratif</h5>
             <p><?= $projetCollaboratifCount ?></p>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- Historique Section -->
-    <section id="historique" class="historique section">
-      <div class="container" data-aos="fade-up">
-        <h2 class="text-center mb-4">Historique des Objectifs</h2>
-        <p class="text-center">Voici la liste des objectifs terminés ou supprimés.</p>
-
-        <?php if (!empty($historiqueObjectifs)): ?>
-          <div class="row gy-4">
-            <?php foreach ($historiqueObjectifs as $objectif): ?>
-              <div class="col-lg-4 col-md-6">
-                <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title"><?= htmlspecialchars($objectif['titre']) ?></h5>
-                    <p class="card-text"><?= htmlspecialchars($objectif['description']) ?></p>
-                    <p class="card-text"><small class="text-muted">Date de fin : <?= htmlspecialchars($objectif['date_fin']) ?></small></p>
-                    <p class="card-text"><small class="text-muted">Statut : Terminé</small></p>
-                  </div>
-                </div>
-              </div>
-            <?php endforeach; ?>
-          </div>
-        <?php else: ?>
-          <div class="text-center">
-            <p>Aucun objectif dans l'historique pour le moment.</p>
-          </div>
-        <?php endif; ?>
+      <div class="col-md-6">
+        <div class="chart-container" style="position: relative; height:300px; width:100%">
+          <canvas id="objectifsChart"></canvas>
+        </div>
       </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact section">
-      <div class="container" data-aos="fade-up">
-        <h2 class="text-center mb-4">Contactez-nous</h2>
-        <p class="text-center">Pour toute question ou assistance, contactez-nous via le formulaire ci-dessous.</p>
-        <form action="contact.php" method="POST">
-          <div class="mb-3">
-            <label for="name" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-          </div>
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-          </div>
-          <div class="mb-3">
-            <label for="message" class="form-label">Message</label>
-            <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
-          </div>
-          <button type="submit" class="btn btn-primary">Envoyer</button>
-        </form>
-      </div>
-    </section>
+    </div>
+  </div>
+</section>
 
   </main>
 
@@ -286,4 +246,55 @@ if ($action === 'sort') {
 
 </body>
 
+<!-- Avant la fermeture de la balise body, ajoutez ce script (après avoir chargé les autres scripts JS) -->
+<!-- Assurez-vous d'ajouter Chart.js avant ce script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const ctx = document.getElementById('objectifsChart').getContext('2d');
+  
+  // Récupérer les données depuis PHP
+  const freelanceCount = <?= $freelanceCount ?>;
+  const stageCount = <?= $stageCount ?>;
+  const projetCollaboratifCount = <?= $projetCollaboratifCount ?>;
+  
+  // Créer le graphique
+  const objectifsChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Freelance', 'Stage', 'Projet Collaboratif'],
+      datasets: [{
+        data: [freelanceCount, stageCount, projetCollaboratifCount],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 206, 86, 0.7)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'Répartition des Objectifs par Statut',
+          font: {
+            size: 16
+          }
+        }
+      }
+    }
+  });
+});
+</script>
 </html>

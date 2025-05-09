@@ -1,0 +1,575 @@
+2025-05-08 14:09:20 - Chargement de tacheF.php
+2025-05-08 14:09:20 - Nombre de tâches récupérées pour stats: 7
+2025-05-08 14:09:20 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:09:20 - Tâches proches de l'échéance: 2
+2025-05-08 14:09:20 - Nombre de tâches récupérées pour affichage: 7
+2025-05-08 14:09:20 - Tâches historiques récupérées: 0
+2025-05-08 14:09:20 - Affichage des erreurs: Erreur lors de l'insertion dans la base de données : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:09:20 - Tâche 3: validation_percentage=60
+2025-05-08 14:09:20 - Tâche 6: validation_percentage=0
+2025-05-08 14:09:20 - Tâche 10: validation_percentage=0
+2025-05-08 14:09:20 - Tâche 14: validation_percentage=0
+2025-05-08 14:09:20 - Tâche 16: validation_percentage=0
+2025-05-08 14:09:20 - Tâche 18: validation_percentage=0
+2025-05-08 14:09:20 - Tâche 19: validation_percentage=40
+2025-05-08 14:09:38 - Début du traitement POST
+2025-05-08 14:09:38 - tache_id: 6, commentaire: hi, fichiers: Array
+(
+    [name] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [full_path] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [type] => Array
+        (
+            [0] => image/jpeg
+        )
+
+    [tmp_name] => Array
+        (
+            [0] => C:\xampp\tmp\php6070.tmp
+        )
+
+    [error] => Array
+        (
+            [0] => 0
+        )
+
+    [size] => Array
+        (
+            [0] => 72751
+        )
+
+)
+
+2025-05-08 14:09:38 - Fichier 0: type=image/jpeg, nom=817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+2025-05-08 14:09:38 - Aucune erreur de validation, début du traitement des fichiers
+2025-05-08 14:09:38 - Validation increment: 20% (PDF: 0, Photo: 1)
+2025-05-08 14:09:38 - Traitement du fichier 0: 681c9f02c215f_817d7143-2cf4-4b79-8931-90b2e608a110.jpg, destination: C:\xampp\htdocs\website1.0\view\Frontoffice\TemplateFront/../../../Uploads/681c9f02c215f_817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+2025-05-08 14:09:38 - Fichier 681c9f02c215f_817d7143-2cf4-4b79-8931-90b2e608a110.jpg téléversé avec succès
+2025-05-08 14:09:38 - Erreur insertion travaux: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:09:38 - Redirection vers: tacheF.php?errors=Erreur+lors+de+l%27insertion+dans+la+base+de+donn%C3%A9es+%3A+SQLSTATE%5B42S22%5D%3A+Column+not+found%3A+1054+Unknown+column+%27commande%27+in+%27field+list%27
+2025-05-08 14:09:38 - Chargement de tacheF.php
+2025-05-08 14:09:38 - Nombre de tâches récupérées pour stats: 7
+2025-05-08 14:09:38 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:09:38 - Tâches proches de l'échéance: 2
+2025-05-08 14:09:38 - Nombre de tâches récupérées pour affichage: 7
+2025-05-08 14:09:38 - Tâches historiques récupérées: 0
+2025-05-08 14:09:38 - Affichage des erreurs: Erreur lors de l'insertion dans la base de données : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:09:38 - Tâche 3: validation_percentage=60
+2025-05-08 14:09:38 - Tâche 6: validation_percentage=0
+2025-05-08 14:09:38 - Tâche 10: validation_percentage=0
+2025-05-08 14:09:38 - Tâche 14: validation_percentage=0
+2025-05-08 14:09:38 - Tâche 16: validation_percentage=0
+2025-05-08 14:09:38 - Tâche 18: validation_percentage=0
+2025-05-08 14:09:38 - Tâche 19: validation_percentage=40
+2025-05-08 14:16:23 - Chargement de tacheF.php
+2025-05-08 14:16:23 - Tâches récupérées pour stats: 7
+2025-05-08 14:16:23 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:16:23 - Tâches proches échéance: 2
+2025-05-08 14:16:23 - Tâches récupérées pour affichage: 7
+2025-05-08 14:16:23 - Tâches historiques: 0
+2025-05-08 14:16:23 - Erreurs affichées: Erreur lors de l'insertion dans la base de données : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:16:23 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:16:23 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:16:23 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:16:23 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:16:23 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:16:23 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:16:23 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:16:24 - Chargement de tacheF.php
+2025-05-08 14:16:24 - Tâches récupérées pour stats: 7
+2025-05-08 14:16:24 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:16:24 - Tâches proches échéance: 2
+2025-05-08 14:16:24 - Tâches récupérées pour affichage: 7
+2025-05-08 14:16:24 - Tâches historiques: 0
+2025-05-08 14:16:24 - Erreurs affichées: Erreur lors de l'insertion dans la base de données : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:16:24 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:16:24 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:16:24 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:16:24 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:16:24 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:16:24 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:16:24 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:16:39 - Début de ajouter_travail.php
+2025-05-08 14:16:39 - Requête POST reçue
+2025-05-08 14:16:39 - Données: tache_id=6, commentaire=g, fichiers=Array
+(
+    [name] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [full_path] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [type] => Array
+        (
+            [0] => image/jpeg
+        )
+
+    [tmp_name] => Array
+        (
+            [0] => C:\xampp\tmp\phpCD76.tmp
+        )
+
+    [error] => Array
+        (
+            [0] => 0
+        )
+
+    [size] => Array
+        (
+            [0] => 72751
+        )
+
+)
+
+2025-05-08 14:16:39 - Tâche 6 validée
+2025-05-08 14:16:39 - Nombre de fichiers: 1
+2025-05-08 14:16:39 - Fichier 0: nom=817d7143-2cf4-4b79-8931-90b2e608a110.jpg, type=image/jpeg
+2025-05-08 14:16:39 - Validation OK, traitement des fichiers
+2025-05-08 14:16:39 - Validation increment: 20% (PDF=0, Photo=1)
+2025-05-08 14:16:39 - Fichier 0: 681ca0a7e1e5e_817d7143-2cf4-4b79-8931-90b2e608a110.jpg, destination: C:\xampp\htdocs\website1.0\view\Frontoffice\TemplateFront/../../../Uploads/681ca0a7e1e5e_817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+2025-05-08 14:16:39 - Fichier 681ca0a7e1e5e_817d7143-2cf4-4b79-8931-90b2e608a110.jpg téléversé
+2025-05-08 14:16:39 - Erreur insertion travaux: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:16:39 - Redirection vers: tacheF.php?errors=Erreur+insertion+travaux+%3A+SQLSTATE%5B42S22%5D%3A+Column+not+found%3A+1054+Unknown+column+%27commande%27+in+%27field+list%27
+2025-05-08 14:16:39 - Chargement de tacheF.php
+2025-05-08 14:16:39 - Tâches récupérées pour stats: 7
+2025-05-08 14:16:39 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:16:39 - Tâches proches échéance: 2
+2025-05-08 14:16:39 - Tâches récupérées pour affichage: 7
+2025-05-08 14:16:39 - Tâches historiques: 0
+2025-05-08 14:16:39 - Erreurs affichées: Erreur insertion travaux : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:16:39 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:16:39 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:16:39 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:16:39 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:16:39 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:16:39 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:16:39 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:18:21 - Chargement de tacheF.php
+2025-05-08 14:18:21 - Tâches récupérées pour stats: 7
+2025-05-08 14:18:21 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:18:21 - Tâches proches échéance: 2
+2025-05-08 14:18:21 - Tâches récupérées pour affichage: 7
+2025-05-08 14:18:21 - Tâches historiques: 0
+2025-05-08 14:18:21 - Erreurs affichées: Erreur insertion travaux : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:18:21 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:18:21 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:18:21 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:18:21 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:18:21 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:18:21 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:18:21 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:18:22 - Chargement de tacheF.php
+2025-05-08 14:18:22 - Tâches récupérées pour stats: 7
+2025-05-08 14:18:22 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:18:22 - Tâches proches échéance: 2
+2025-05-08 14:18:22 - Tâches récupérées pour affichage: 7
+2025-05-08 14:18:22 - Tâches historiques: 0
+2025-05-08 14:18:22 - Erreurs affichées: Erreur insertion travaux : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:18:22 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:18:22 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:18:22 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:18:22 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:18:22 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:18:22 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:18:22 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:18:34 - Début de ajouter_travail.php
+2025-05-08 14:18:34 - Requête POST reçue
+2025-05-08 14:18:34 - Données: tache_id=3, commentaire=, fichiers=Array
+(
+    [name] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [full_path] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [type] => Array
+        (
+            [0] => image/jpeg
+        )
+
+    [tmp_name] => Array
+        (
+            [0] => C:\xampp\tmp\php8D57.tmp
+        )
+
+    [error] => Array
+        (
+            [0] => 0
+        )
+
+    [size] => Array
+        (
+            [0] => 72751
+        )
+
+)
+
+2025-05-08 14:18:34 - Tâche 3 validée
+2025-05-08 14:18:34 - Nombre de fichiers: 1
+2025-05-08 14:18:34 - Fichier 0: nom=817d7143-2cf4-4b79-8931-90b2e608a110.jpg, type=image/jpeg
+2025-05-08 14:18:34 - Validation OK, traitement des fichiers
+2025-05-08 14:18:34 - Validation increment: 20% (PDF=0, Photo=1)
+2025-05-08 14:18:34 - Fichier 0: 681ca11a84c30_817d7143-2cf4-4b79-8931-90b2e608a110.jpg, destination: C:\xampp\htdocs\website1.0\view\Frontoffice\TemplateFront/../../../Uploads/681ca11a84c30_817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+2025-05-08 14:18:34 - Fichier 681ca11a84c30_817d7143-2cf4-4b79-8931-90b2e608a110.jpg téléversé
+2025-05-08 14:18:34 - Erreur insertion travaux: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:18:34 - Redirection vers: tacheF.php?errors=Erreur+insertion+travaux+%3A+SQLSTATE%5B42S22%5D%3A+Column+not+found%3A+1054+Unknown+column+%27commande%27+in+%27field+list%27
+2025-05-08 14:18:34 - Chargement de tacheF.php
+2025-05-08 14:18:34 - Tâches récupérées pour stats: 7
+2025-05-08 14:18:34 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:18:34 - Tâches proches échéance: 2
+2025-05-08 14:18:34 - Tâches récupérées pour affichage: 7
+2025-05-08 14:18:34 - Tâches historiques: 0
+2025-05-08 14:18:34 - Erreurs affichées: Erreur insertion travaux : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:18:34 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:18:34 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:18:34 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:18:34 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:18:34 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:18:34 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:18:34 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:23:05 - Chargement de tacheF.php
+2025-05-08 14:23:05 - Tâches récupérées pour stats: 7
+2025-05-08 14:23:05 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:23:05 - Tâches proches échéance: 2
+2025-05-08 14:23:05 - Tâches récupérées pour affichage: 7
+2025-05-08 14:23:05 - Tâches historiques: 0
+2025-05-08 14:23:05 - Erreurs affichées: Erreur insertion travaux : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:23:05 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:23:05 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:23:05 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:23:05 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:23:05 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:23:05 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:23:05 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:23:17 - Début de ajouter_travail.php
+2025-05-08 14:23:17 - Requête POST reçue: Array
+(
+    [tache_id] => 3
+    [commentaire] => g
+)
+, FILES: Array
+(
+    [piece_jointe] => Array
+        (
+            [name] => Array
+                (
+                    [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpE028.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 72751
+                )
+
+        )
+
+)
+
+2025-05-08 14:23:17 - Données reçues: tache_id=3, commentaire=g, fichiers=Array
+(
+    [name] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [full_path] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [type] => Array
+        (
+            [0] => image/jpeg
+        )
+
+    [tmp_name] => Array
+        (
+            [0] => C:\xampp\tmp\phpE028.tmp
+        )
+
+    [error] => Array
+        (
+            [0] => 0
+        )
+
+    [size] => Array
+        (
+            [0] => 72751
+        )
+
+)
+
+2025-05-08 14:23:17 - Tâche 3 validée
+2025-05-08 14:23:17 - Nombre de fichiers: 1
+2025-05-08 14:23:17 - Fichier 0: nom=817d7143-2cf4-4b79-8931-90b2e608a110.jpg, type=image/jpeg
+2025-05-08 14:23:17 - Validation OK, traitement des fichiers
+2025-05-08 14:23:17 - Validation increment: 20% (PDF=0, Photo=1)
+2025-05-08 14:23:17 - Fichier 0: 681ca235deb44_817d7143-2cf4-4b79-8931-90b2e608a110.jpg, destination: C:\xampp\htdocs\website1.0\view\Frontoffice\TemplateFront/../../../Uploads/681ca235deb44_817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+2025-05-08 14:23:17 - Fichier 681ca235deb44_817d7143-2cf4-4b79-8931-90b2e608a110.jpg téléversé
+2025-05-08 14:23:17 - Erreur insertion travaux: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:23:17 - Redirection vers: tacheF.php?errors=Erreur+insertion+travaux+%3A+SQLSTATE%5B42S22%5D%3A+Column+not+found%3A+1054+Unknown+column+%27commande%27+in+%27field+list%27
+2025-05-08 14:23:17 - Chargement de tacheF.php
+2025-05-08 14:23:17 - Tâches récupérées pour stats: 7
+2025-05-08 14:23:17 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:23:17 - Tâches proches échéance: 2
+2025-05-08 14:23:17 - Tâches récupérées pour affichage: 7
+2025-05-08 14:23:17 - Tâches historiques: 0
+2025-05-08 14:23:17 - Erreurs affichées: Erreur insertion travaux : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:23:17 - Tâche 3: nom=hi, validation_percentage=60
+2025-05-08 14:23:17 - Tâche 6: nom=lik, validation_percentage=0
+2025-05-08 14:23:17 - Tâche 10: nom=ob, validation_percentage=0
+2025-05-08 14:23:17 - Tâche 14: nom=ggg, validation_percentage=0
+2025-05-08 14:23:17 - Tâche 16: nom=tache, validation_percentage=0
+2025-05-08 14:23:17 - Tâche 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:23:17 - Tâche 19: nom=tache une, validation_percentage=40
+2025-05-08 14:27:09 - Loading tacheF.php
+2025-05-08 14:27:09 - Fetched 7 tasks for stats
+2025-05-08 14:27:09 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:27:09 - Tasks nearing deadline: 2
+2025-05-08 14:27:09 - Fetched 7 tasks for display
+2025-05-08 14:27:09 - Fetched 0 completed tasks
+2025-05-08 14:27:09 - Displayed errors: Erreur insertion travaux : SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:27:09 - Task 3: nom=hi, validation_percentage=60
+2025-05-08 14:27:09 - Task 6: nom=lik, validation_percentage=0
+2025-05-08 14:27:09 - Task 10: nom=ob, validation_percentage=0
+2025-05-08 14:27:09 - Task 14: nom=ggg, validation_percentage=0
+2025-05-08 14:27:09 - Task 16: nom=tache, validation_percentage=0
+2025-05-08 14:27:09 - Task 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:27:09 - Task 19: nom=tache une, validation_percentage=40
+2025-05-08 14:27:23 - Starting ajouter_travail.php
+2025-05-08 14:27:23 - POST request received: Array
+(
+    [tache_id] => 3
+    [commentaire] => hi
+)
+, FILES: Array
+(
+    [piece_jointe] => Array
+        (
+            [name] => Array
+                (
+                    [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpA109.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 72751
+                )
+
+        )
+
+)
+
+2025-05-08 14:27:23 - Form data: tache_id=3, commentaire=hi, files=Array
+(
+    [name] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [full_path] => Array
+        (
+            [0] => 817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+        )
+
+    [type] => Array
+        (
+            [0] => image/jpeg
+        )
+
+    [tmp_name] => Array
+        (
+            [0] => C:\xampp\tmp\phpA109.tmp
+        )
+
+    [error] => Array
+        (
+            [0] => 0
+        )
+
+    [size] => Array
+        (
+            [0] => 72751
+        )
+
+)
+
+2025-05-08 14:27:23 - Task 3 validated
+2025-05-08 14:27:23 - File count: 1
+2025-05-08 14:27:23 - File 0: name=817d7143-2cf4-4b79-8931-90b2e608a110.jpg, type=image/jpeg
+2025-05-08 14:27:23 - Validation passed, processing files
+2025-05-08 14:27:23 - Validation increment: 20% (PDFs=0, Photos=1)
+2025-05-08 14:27:23 - Processing file 0: 681ca32be133d_817d7143-2cf4-4b79-8931-90b2e608a110.jpg, path: C:\xampp\htdocs\website1.0\view\Frontoffice\TemplateFront/../../../Uploads/681ca32be133d_817d7143-2cf4-4b79-8931-90b2e608a110.jpg
+2025-05-08 14:27:23 - File 681ca32be133d_817d7143-2cf4-4b79-8931-90b2e608a110.jpg uploaded successfully
+2025-05-08 14:27:23 - PDO Error (travaux insert): SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:27:23 - Redirecting to: tacheF.php?errors=Error+inserting+into+travaux%3A+SQLSTATE%5B42S22%5D%3A+Column+not+found%3A+1054+Unknown+column+%27commande%27+in+%27field+list%27
+2025-05-08 14:27:23 - Loading tacheF.php
+2025-05-08 14:27:23 - Fetched 7 tasks for stats
+2025-05-08 14:27:23 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:27:23 - Tasks nearing deadline: 2
+2025-05-08 14:27:23 - Fetched 7 tasks for display
+2025-05-08 14:27:23 - Fetched 0 completed tasks
+2025-05-08 14:27:23 - Displayed errors: Error inserting into travaux: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:27:23 - Task 3: nom=hi, validation_percentage=60
+2025-05-08 14:27:23 - Task 6: nom=lik, validation_percentage=0
+2025-05-08 14:27:23 - Task 10: nom=ob, validation_percentage=0
+2025-05-08 14:27:23 - Task 14: nom=ggg, validation_percentage=0
+2025-05-08 14:27:23 - Task 16: nom=tache, validation_percentage=0
+2025-05-08 14:27:23 - Task 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:27:23 - Task 19: nom=tache une, validation_percentage=40
+2025-05-08 14:27:49 - Starting ajouter_travail.php
+2025-05-08 14:27:49 - POST request received: Array
+(
+    [tache_id] => 18
+    [commentaire] => f
+)
+, FILES: Array
+(
+    [piece_jointe] => Array
+        (
+            [name] => Array
+                (
+                    [0] => الجلسة2025 (1).pdf
+                )
+
+            [full_path] => Array
+                (
+                    [0] => الجلسة2025 (1).pdf
+                )
+
+            [type] => Array
+                (
+                    [0] => application/pdf
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php62D.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 208511
+                )
+
+        )
+
+)
+
+2025-05-08 14:27:49 - Form data: tache_id=18, commentaire=f, files=Array
+(
+    [name] => Array
+        (
+            [0] => الجلسة2025 (1).pdf
+        )
+
+    [full_path] => Array
+        (
+            [0] => الجلسة2025 (1).pdf
+        )
+
+    [type] => Array
+        (
+            [0] => application/pdf
+        )
+
+    [tmp_name] => Array
+        (
+            [0] => C:\xampp\tmp\php62D.tmp
+        )
+
+    [error] => Array
+        (
+            [0] => 0
+        )
+
+    [size] => Array
+        (
+            [0] => 208511
+        )
+
+)
+
+2025-05-08 14:27:49 - Task 18 validated
+2025-05-08 14:27:49 - File count: 1
+2025-05-08 14:27:49 - File 0: name=الجلسة2025 (1).pdf, type=application/pdf
+2025-05-08 14:27:49 - Validation passed, processing files
+2025-05-08 14:27:49 - Validation increment: 40% (PDFs=1, Photos=0)
+2025-05-08 14:27:49 - Processing file 0: 681ca345c98a0_الجلسة2025 (1).pdf, path: C:\xampp\htdocs\website1.0\view\Frontoffice\TemplateFront/../../../Uploads/681ca345c98a0_الجلسة2025 (1).pdf
+2025-05-08 14:27:49 - File 681ca345c98a0_الجلسة2025 (1).pdf uploaded successfully
+2025-05-08 14:27:49 - PDO Error (travaux insert): SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:27:49 - Redirecting to: tacheF.php?errors=Error+inserting+into+travaux%3A+SQLSTATE%5B42S22%5D%3A+Column+not+found%3A+1054+Unknown+column+%27commande%27+in+%27field+list%27
+2025-05-08 14:27:49 - Loading tacheF.php
+2025-05-08 14:27:49 - Fetched 7 tasks for stats
+2025-05-08 14:27:49 - Stats: Total=7, En cours=5, Formation=2, Atteinte=0
+2025-05-08 14:27:49 - Tasks nearing deadline: 2
+2025-05-08 14:27:49 - Fetched 7 tasks for display
+2025-05-08 14:27:49 - Fetched 0 completed tasks
+2025-05-08 14:27:49 - Displayed errors: Error inserting into travaux: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'commande' in 'field list'
+2025-05-08 14:27:49 - Task 3: nom=hi, validation_percentage=60
+2025-05-08 14:27:49 - Task 6: nom=lik, validation_percentage=0
+2025-05-08 14:27:49 - Task 10: nom=ob, validation_percentage=0
+2025-05-08 14:27:49 - Task 14: nom=ggg, validation_percentage=0
+2025-05-08 14:27:49 - Task 16: nom=tache, validation_percentage=0
+2025-05-08 14:27:49 - Task 18: nom=Oumayma, validation_percentage=0
+2025-05-08 14:27:49 - Task 19: nom=tache une, validation_percentage=40

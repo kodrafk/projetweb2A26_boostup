@@ -1,60 +1,37 @@
 <?php
-include 'config.php'; // Connexion à la base de données
+// Database connection
+include 'config.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Si l'ID est défini, on effectue une mise à jour (modification)
-    if (isset($_POST['id_objectif']) && !empty($_POST['id_objectif'])) {
-        // Récupération des données du formulaire
-        $id_objectif = $_POST['id_objectif'];
-        $nom = $_POST['nom'];  // Nom du champ
-        $status = $_POST['status'];  // Status
-        $date_limite = $_POST['date_limite'];  // Date limite
-        $description = $_POST['description'];  // Description
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-        // Mise à jour de l'objectif dans la base de données
-        $sql = "UPDATE objectif SET nom = ?, description = ?, status = ?, date_limite = ? WHERE id = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$nom, $description, $status, $date_limite, $id_objectif]);
+// Fetch all objectives
+$stmt = $pdo->query("SELECT * FROM objectif");
+$objectifs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Redirection après la mise à jour pour éviter la resoumission du formulaire
-        header("Location: objectif.php");
-        exit;
-    } else {
-        // Si l'ID n'est pas défini, il s'agit d'un ajout
-        $nom = $_POST['nom'];  // Nom
-        $status = $_POST['status'];  // Status
-        $date_limite = $_POST['date_limite'];  // Date limite
-        $description = $_POST['description'];  // Description
-        $id_projet = 1;  // ID de projet facultatif pour l'exemple
+// Fetch attachments for each objective
+$attachmentsByObjectif = [];
+foreach ($objectifs as $objectif) {
+    $objectif_id = $objectif['id'];
+    // Fetch tasks associated with this objective
+    $stmt = $pdo->prepare("SELECT id, nom FROM tache WHERE id_objectif = ?");
+    $stmt->execute([$objectif_id]);
+    $taches = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Insertion dans la base de données
-        $sql = "INSERT INTO objectif (nom, description, status, date_limite, id_projet) VALUES (?, ?, ?, ?, ?)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$nom, $description, $status, $date_limite, $id_projet]);
-
-        // Redirection après l'insertion
-        header("Location: objectif.php");
-        exit;
+    $attachments = [];
+    foreach ($taches as $tache) {
+        // Fetch attachments for each task
+        $stmt = $pdo->prepare("SELECT id, piece_jointe, date_creation FROM travaux WHERE tache_id = ?");
+        $stmt->execute([$tache['id']]);
+        $tache_attachments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($tache_attachments as $attachment) {
+            $attachment['tache_nom'] = $tache['nom'];
+            $attachments[] = $attachment;
+        }
     }
-}
-
-// Mode édition : Récupération des données de l'objectif pour préremplir le formulaire
-$editMode = false;
-$objectifData = [
-    'id' => '',
-    'nom' => '',
-    'status' => '',
-    'date_limite' => '',
-    'description' => ''
-];
-
-// Si on est en mode édition, on récupère les données de l'objectif à modifier
-if (isset($_GET['edit'])) {
-    $editMode = true;
-    $id = $_GET['edit'];
-    $stmt = $pdo->prepare("SELECT * FROM objectif WHERE id = ?");
-    $stmt->execute([$id]);
-    $objectifData = $stmt->fetch(PDO::FETCH_ASSOC);
+    $attachmentsByObjectif[$objectif_id] = $attachments;
 }
 ?>
 
@@ -62,7 +39,7 @@ if (isset($_GET['edit'])) {
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Boostup</title>
+    <title>Historique des Pièces Jointes - Boostup</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -260,119 +237,62 @@ if (isset($_GET['edit'])) {
             </nav>
             <!-- Navbar End -->
 
-            <!-- Chart Start -->
+            <!-- Historique Pièces Jointes -->
             <div class="container-fluid pt-4 px-4">
-                <div class="row g-4">
+                <div class="glass-card card mb-4 animate__animated animate__fadeIn">
+                    <div class="card-header py-3 bg-primary text-white">
+                        <h6 class="m-0 font-weight-bold"><i class="fas fa-history me-2"></i> Historique des Pièces Jointes par Objectif</h6>
+                    </div>
+                    <div class="card-body p-4" style="background-color: #F3F6F9;">
+                        <?php if (!empty($objectifs)): ?>
+                            <?php foreach ($objectifs as $objectif): ?>
+                                <div class="mb-4">
+                                    <h5 class="text-primary"><?= htmlspecialchars($objectif['nom']) ?> (ID: <?= $objectif['id'] ?>)</h5>
+                                    <?php $attachments = $attachmentsByObjectif[$objectif['id']]; ?>
+                                    <?php if (!empty($attachments)): ?>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered align-middle text-center">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Tâche</th>
+                                                        <th>Pièce Jointe</th>
+                                                        <th>Date d'Ajout</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php foreach ($attachments as $attachment): ?>
+                                                        <tr>
+                                                            <td><?= htmlspecialchars($attachment['tache_nom']) ?></td>
+                                                            <td><?= htmlspecialchars($attachment['piece_jointe']) ?></td>
+                                                            <td><?= htmlspecialchars($attachment['date_creation']) ?></td>
+                                                            <td>
+                                                                <a href="/website1.0/uploads/<?= htmlspecialchars($attachment['piece_jointe']) ?>" target="_blank" class="btn btn-primary btn-sm">
+                                                                    <i class="fas fa-eye me-1"></i> Voir
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    <?php else: ?>
+                                        <p>Aucune pièce jointe pour cet objectif.</p>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p>Aucun objectif trouvé.</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-            <!-- Chart End -->
+            <!-- Fin Historique -->
 
-            <!-- Formulaire CRUD -->
-            <div class="glass-card card mb-4 animate__animated animate__fadeIn">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-primary text-white">
-                    <h6 class="m-0 font-weight-bold"><i class="fas fa-project-diagram me-2"></i> Gestion Objectifs</h6>
-                    <!-- Bouton Historique -->
-                    <a href="historique_objectif.php" class="btn btn-light btn-sm">
-                        <i class="fas fa-history me-1"></i> Historique
-                    </a>
-                </div>
-                <div class="card-body p-4" style="background-color: #F3F6F9;">
-                    <form method="POST" action="objectif.php">
-                        <!-- ID caché pour modification -->
-                        <input type="hidden" name="id_objectif" value="<?= $objectifData['id'] ?>">
-
-                        <div class="form-section">
-                            <h5 class="section-title"><i class="fas fa-folder-open me-2"></i>Informations de l'Objectif</h5>
-                            <div class="row g-3">
-
-                                <!-- Champ Nom -->
-                                <div class="col-md-6">
-                                    <label for="nom" class="form-label">Nom</label>
-                                    <input type="text" id="nom" name="nom" class="form-control" value="<?= htmlspecialchars($objectifData['nom']) ?>" placeholder="Nom..." >
-                                </div>
-
-                                <!-- Champ Status -->
-                                <div class="col-md-6">
-                                    <label for="status" class="form-label">Status</label>
-                                    <select id="status" name="status" class="form-control" >
-                                        <option value="">Sélectionner un type</option>
-                                        <option value="freelance" <?= $objectifData['status'] == 'freelance' ? 'selected' : '' ?>>freelance</option>
-                                        <option value="stage" <?= $objectifData['status'] == 'stage' ? 'selected' : '' ?>>stage</option>
-                                        <option value="projet collaboratif" <?= $objectifData['status'] == 'projet collaboratif' ? 'selected' : '' ?>>projet collaboratif</option>
-                                    </select>
-                                </div>
-
-                                <!-- Champ Date Limite -->
-                                <div class="col-md-6">
-                                    <label for="date_limite" class="form-label">Date Limite</label>
-                                    <input type="date" id="date_limite" name="date_limite" class="form-control" value="<?= $objectifData['date_limite'] ?>" >
-                                </div>
-
-                                <!-- Champ Description -->
-                                <div class="col-12">
-                                    <label for="description" class="form-label">Description</label>
-                                    <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez Objectifs en détail..." ><?= htmlspecialchars($objectifData['description']) ?></textarea>
-                                </div>
-                            </div>
-
-                            <!-- Actions -->
-                            <div class="d-flex justify-content-between mt-4">
-                                <div>
-                                    <button type="reset" class="btn btn-secondary me-2">
-                                        <i class="fas fa-times me-1"></i> Annuler
-                                    </button>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-check me-1"></i> <?= $editMode ? "Modifier" : "Enregistrer" ?>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <!-- Form End -->
-
-            <!-- tableau d'affichage -->
-            <div class="container mt-5">
-                <h5 class="text-primary mb-3"><i class="bi bi-list"></i> Liste des objectifs</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle text-center">
-                    <thead class="table-light">
-                        <tr>
-                        <th>Nom</th>
-                        <th>status</th>
-                        <th>Date_limite</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $stmt = $pdo->query("SELECT * FROM objectif");
-                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) 
-                        {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($row['nom']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['status']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['date_limite']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['description']) . "</td>";
-                            echo "<td>
-                            <a href='supprimer_objectif.php?id={$row['id']}' class='btn btn-supprimer btn-sm'>🗑 Supprimer</a>
-                            <a href='objectif.php?edit=" . $row['id'] . "' class='btn btn-modifier btn-sm'>✏️ Modifier</a>
-                            </td>";
-                            echo "</tr>";
-                        }
-                        ?>
-                    </tbody>
-                    </table>
-                </div>
-            </div>
-            <!-- fin de tableau -->
+            <!-- Back to Top -->
+            <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
         </div>
         <!-- Content End -->
-
-        <!-- Back to Top -->
-        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
 
     <!-- JavaScript Libraries -->

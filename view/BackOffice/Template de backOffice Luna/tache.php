@@ -2,8 +2,15 @@
 // Connexion à la base de données
 include 'config.php';
 
-// Récupérer toutes les tâches
-$stmt = $pdo->prepare("SELECT * FROM tache");
+// Récupérer tous les objectifs pour le menu déroulant
+$stmt_objectifs = $pdo->prepare("SELECT * FROM objectif");
+$stmt_objectifs->execute();
+$objectifs = $stmt_objectifs->fetchAll(PDO::FETCH_ASSOC);
+
+// Récupérer toutes les tâches avec leurs objectifs associés
+$stmt = $pdo->prepare("SELECT t.*, o.nom as nom_objectif 
+                      FROM tache t 
+                      LEFT JOIN objectif o ON t.id_objectif = o.id");
 $stmt->execute();
 $taches = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -15,11 +22,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST['status'];
     $date_echeance = $_POST['date_limite'];
     $description = trim($_POST['description']);
+    $id_objectif = $_POST['id_objectif']; // Nouveau champ pour le lien avec objectif
 
     if (empty($nom)) $erreurs[] = "Le nom est requis.";
     if (empty($status)) $erreurs[] = "Le status est requis.";
     if (empty($date_echeance)) $erreurs[] = "La date limite est requise.";
     if (empty($description)) $erreurs[] = "La description est requise.";
+    if (empty($id_objectif)) $erreurs[] = "L'objectif associé est requis.";
 
     // Date limite dans le passé
     if (!empty($date_echeance) && $date_echeance < date('Y-m-d')) {
@@ -30,15 +39,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST['id_tache']) && !empty($_POST['id_tache'])) {
             // Mise à jour
             $id_tache = $_POST['id_tache'];
-            $sql = "UPDATE tache SET nom = ?, description = ?, status = ?, date_echeance = ? WHERE id = ?";
+            $sql = "UPDATE tache SET nom = ?, description = ?, status = ?, date_echeance = ?, id_objectif = ? WHERE id = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$nom, $description, $status, $date_echeance, $id_tache]);
+            $stmt->execute([$nom, $description, $status, $date_echeance, $id_objectif, $id_tache]);
         } else {
             // Insertion
-            $id_projet = 1;
-            $sql = "INSERT INTO tache (nom, description, status, date_echeance, id_projet) VALUES (?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO tache (nom, description, status, date_echeance, id_objectif) VALUES (?, ?, ?, ?, ?)";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$nom, $description, $status, $date_echeance, $id_projet]);
+            $stmt->execute([$nom, $description, $status, $date_echeance, $id_objectif]);
         }
 
         header("Location: tache.php");
@@ -46,16 +54,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-
 // Récupération des données de tâche pour le formulaire (mode édition)
 $editMode = false;
-$tacheData = ['id' => '', 'nom' => '', 'status' => '', 'date_echeance' => '', 'description' => ''];
+$tacheData = ['id' => '', 'nom' => '', 'status' => '', 'date_echeance' => '', 'description' => '', 'id_objectif' => ''];
 
 if (isset($_GET['id'])) {
     $stmt = $pdo->prepare("SELECT * FROM tache WHERE id = ?");
     $stmt->execute([$_GET['id']]);
     $tacheData = $stmt->fetch(PDO::FETCH_ASSOC);
     $editMode = true;
+}
+
+// Récupération de l'ID d'objectif depuis l'URL si disponible (pour préremplir lors de la création depuis la page objectif)
+$preselected_objectif = '';
+if (isset($_GET['id_objectif']) && !empty($_GET['id_objectif'])) {
+    $preselected_objectif = $_GET['id_objectif'];
+    // Si on n'est pas en mode édition, on utilise cette valeur
+    if (!$editMode) {
+        $tacheData['id_objectif'] = $preselected_objectif;
+    }
 }
 ?>
 
@@ -288,7 +305,7 @@ if (isset($_GET['id'])) {
                         <h6 class="m-0 font-weight-bold"><i class="fas fa-project-diagram me-2"></i> 
                         <?= isset($tacheData['id']) && $tacheData['id'] ? 'Modifier' : 'Ajouter' ?> la Tâche</h6>
                     </div>
-                    <div   div class="card-body p-4" style="background-color: #F3F6F9;">
+                    <div class="card-body p-4" style="background-color: #F3F6F9;">
                     <form method="POST" action="tache.php">
                     <!-- ID caché pour modification -->
                     <input type="hidden" name="id_tache" value="<?= isset($tacheData['id']) ? htmlspecialchars($tacheData['id']) : '' ?>">
@@ -297,18 +314,37 @@ if (isset($_GET['id'])) {
                         <h5 class="section-title"><i class="fas fa-folder-open me-2"></i> Informations de la Tâche</h5>
                         <div class="row g-3">
 
+                            <!-- NOUVEAU : Sélection de l'objectif associé -->
+                            <div class="col-md-6">
+                                <label for="id_objectif" class="form-label">Objectif associé</label>
+                                <div class="input-group">
+                                    <select id="id_objectif" name="id_objectif" class="form-control" required>
+                                        <option value="">Sélectionner un objectif</option>
+                                        <?php foreach ($objectifs as $objectif): ?>
+                                            <option value="<?= $objectif['id'] ?>" 
+                                                <?= (isset($tacheData['id_objectif']) && $tacheData['id_objectif'] == $objectif['id']) ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($objectif['nom']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#nouvelObjectifModal">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
                             <!-- Champ Nom -->
                             <div class="col-md-6">
                                 <label for="nom" class="form-label">Nom</label>
                                 <input type="text" id="nom" name="nom" class="form-control" 
                                 value="<?= isset($tacheData['nom']) ? htmlspecialchars($tacheData['nom']) : '' ?>" 
-                                placeholder="Nom de la tâche..." >
+                                placeholder="Nom de la tâche..." required>
                             </div>
 
                             <!-- Champ Status -->
                             <div class="col-md-6">
                                 <label for="status" class="form-label">Status</label>
-                                <select id="status" name="status" class="form-control" >
+                                <select id="status" name="status" class="form-control" required>
                                     <option value="">Sélectionner un type</option>
                                     <option value="en cour" <?= isset($tacheData['status']) && $tacheData['status'] == 'en cour' ? 'selected' : '' ?>>En cours</option>
                                     <option value="atteinte" <?= isset($tacheData['status']) && $tacheData['status'] == 'atteinte' ? 'selected' : '' ?>>Atteinte</option>
@@ -320,13 +356,13 @@ if (isset($_GET['id'])) {
                             <div class="col-md-6">
                                 <label for="date_limite" class="form-label">Date Limite</label>
                                 <input type="date" id="date_limite" name="date_limite" class="form-control" 
-                                value="<?= isset($tacheData['date_echeance']) ? htmlspecialchars($tacheData['date_echeance']) : '' ?>" >
+                                value="<?= isset($tacheData['date_echeance']) ? htmlspecialchars($tacheData['date_echeance']) : '' ?>" required>
                             </div>
 
                             <!-- Champ Description -->
                             <div class="col-12">
                                 <label for="description" class="form-label">Description</label>
-                                <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez la tâche en détail..." ><?= isset($tacheData['description']) ? htmlspecialchars($tacheData['description']) : '' ?></textarea>
+                                <textarea id="description" name="description" class="form-control" rows="3" placeholder="Décrivez la tâche en détail..." required><?= isset($tacheData['description']) ? htmlspecialchars($tacheData['description']) : '' ?></textarea>
                             </div>
                         </div>
 
@@ -346,9 +382,48 @@ if (isset($_GET['id'])) {
             </div>
         </div>
 
+        <!-- Modal pour ajouter un nouvel objectif sans quitter la page -->
+        <div class="modal fade" id="nouvelObjectifModal" tabindex="-1" aria-labelledby="nouvelObjectifModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="nouvelObjectifModalLabel"><i class="fas fa-flag me-2"></i>Ajouter un nouvel objectif</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="quickObjectifForm">
+                            <div class="mb-3">
+                                <label for="modal_nom" class="form-label">Nom</label>
+                                <input type="text" class="form-control" id="modal_nom" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="modal_status" class="form-label">Status</label>
+                                <select class="form-control" id="modal_status" required>
+                                    <option value="">Sélectionner un type</option>
+                                    <option value="freelance">Freelance</option>
+                                    <option value="stage">Stage</option>
+                                    <option value="projet collaboratif">Projet collaboratif</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="modal_date_limite" class="form-label">Date Limite</label>
+                                <input type="date" class="form-control" id="modal_date_limite" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="modal_description" class="form-label">Description</label>
+                                <textarea class="form-control" id="modal_description" rows="3" required></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        <button type="button" class="btn btn-primary" id="saveObjectifBtn">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-
-                <!-- Tableau des tâches -->
+        <!-- Tableau des tâches -->
         <div class="container mt-5">
             <h5 class="text-primary mb-3"><i class="bi bi-list"></i> Liste des Tâches</h5>
             <div class="table-responsive">
@@ -356,6 +431,7 @@ if (isset($_GET['id'])) {
                     <thead class="table-light">
                         <tr>
                             <th>Nom</th>
+                            <th>Objectif associé</th>
                             <th>Status</th>
                             <th>Date Limite</th>
                             <th>Description</th>
@@ -366,6 +442,7 @@ if (isset($_GET['id'])) {
                         <?php foreach ($taches as $tache): ?>
                             <tr>
                                 <td><?= htmlspecialchars($tache['nom']) ?></td>
+                                <td><?= htmlspecialchars($tache['nom_objectif'] ?? 'Non défini') ?></td>
                                 <td><?= htmlspecialchars($tache['status']) ?></td>
                                 <td><?= $tache['date_echeance'] ?></td>
                                 <td><?= htmlspecialchars($tache['description']) ?></td>
@@ -398,34 +475,78 @@ if (isset($_GET['id'])) {
 
     <!-- Template Javascript -->
     <script src="js/main.js"></script>
-</body>
 
-<!-- Controle de saisie -->
-<script>
-document.querySelector("form").addEventListener("submit", function(e) {
-    const nom = document.getElementById("nom").value.trim();
-    const status = document.getElementById("status").value;
-    const dateLimite = document.getElementById("date_limite").value;
-    const description = document.getElementById("description").value.trim();
+    <!-- Script pour ajouter un objectif depuis le modal -->
+    <script>
+    document.getElementById('saveObjectifBtn').addEventListener('click', function() {
+        const nom = document.getElementById('modal_nom').value;
+        const status = document.getElementById('modal_status').value;
+        const date_limite = document.getElementById('modal_date_limite').value;
+        const description = document.getElementById('modal_description').value;
+        
+        if (!nom || !status || !date_limite || !description) {
+            alert('Veuillez remplir tous les champs');
+            return;
+        }
+        
+        // Envoyer les données à un script qui ajoutera l'objectif
+        fetch('ajouter_objectif_ajax.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: nom=${encodeURIComponent(nom)}&status=${encodeURIComponent(status)}&date_limite=${encodeURIComponent(date_limite)}&description=${encodeURIComponent(description)}
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Ajouter le nouvel objectif au select
+                const select = document.getElementById('id_objectif');
+                const option = document.createElement('option');
+                option.value = data.id;
+                option.text = nom;
+                option.selected = true;
+                select.add(option);
+                
+                // Fermer le modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nouvelObjectifModal'));
+                modal.hide();
+                
+                // Réinitialiser le formulaire
+                document.getElementById('quickObjectifForm').reset();
+                
+                // Message de succès
+                alert('Objectif ajouté avec succès!');
+            } else {
+                alert('Erreur: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de l\'ajout de l\'objectif');
+        });
+    });
+    </script>
 
-    if (!nom || !status || !dateLimite || !description) {
-        alert("Veuillez remplir tous les champs.");
-        e.preventDefault(); // bloque l'envoi du formulaire
-        return;
-    }
-    // Vérification que le champ Nom contient uniquement des lettres alphabétiques
-    if (!/^[a-zA-Z]+$/.test(nom)) {
-        alert("Le champ Nom doit contenir uniquement des lettres (sans espaces ni caractères spéciaux).");
-        e.preventDefault(); // bloque l'envoi du formulaire
-        return;
-    }
+    <!-- Controle de saisie -->
+    <script>
+    document.querySelector("form").addEventListener("submit", function(e) {
+        const nom = document.getElementById("nom").value.trim();
+        const status = document.getElementById("status").value;
+        const dateLimite = document.getElementById("date_limite").value;
+        const description = document.getElementById("description").value.trim();
+        const idObjectif = document.getElementById("id_objectif").value;
 
-   
+        if (!nom || !status || !dateLimite || !description || !idObjectif) {
+            alert("Veuillez remplir tous les champs.");
+            e.preventDefault(); // bloque l'envoi du formulaire
+            return;
+        }
 
-    // Optionnel : on vérifie que la date limite n’est pas dans le passé
-    const today = new Date().toISOString().split('T')[0];
-    if (dateLimite < today) {
-        alert("La date limite ne peut pas être dans le passé.");
+        // Optionnel : on vérifie que la date limite n'est pas dans le passé
+        const today = new Date().toISOString().split('T')[0];
+        if (dateLimite < today) {
+            alert("La date limite ne peut pas être dans le passé.");
         e.preventDefault();
         return;
     }
