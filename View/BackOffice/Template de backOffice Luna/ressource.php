@@ -734,17 +734,17 @@ body.modal-open {
                                 </form>
 
                                  <!-- Bouton SMS conditionnel -->
-                                 <?php if (
+                                 <!--?php if (
                                    ($ressource['type'] === 'Cour' || $ressource['type'] === 'Evenement') &&
                                    ($ressource['type_acces'] === 'En ligne' || $ressource['type_acces'] === 'Live')
-                                     ): ?>
-                                    <form method="POST" action="sms.php" style="display:inline-block; margin-top:5px;">
+                                     ): ?-->
+                                    <!--form method="POST" action="sms.php" style="display:inline-block; margin-top:5px;">
                                        <input type="hidden" name="id_ressource" value="<?= $ressource['id_ressource'] ?>">
                                        <button type="submit" class="btn btn-success btn-sm">
                                          <i class="bi bi-chat-dots-fill"></i> SMS
                                        </button>
-                                    </form>
-                                  <?php endif; ?>
+                                    </form-->
+                                  <!--?php endif; ?-->
                             </td>
                         </tr>
                     <?php endforeach; ?>
